@@ -12,13 +12,24 @@ abstract class AbstractSocialClient
     protected $client;
 
     protected $container;
-    
+
     protected function __construct(ContainerInterface $container,string $socialNetworkName)
     {
         $store = new Store($container->getParameter('kernel.project_dir').'/var/cache/WebServices/'.$socialNetworkName.'/');
         $this->client=new CurlHttpClient();
         $this->client = new CachingHttpClient($this->client, $store);
         $this->container = $container;
+    }
+
+    public function getApiUrl($url)
+    {
+        $response=$this->client->request('GET',$url);
+        if($response->getStatusCode()== 200)
+        {
+            return json_decode($response->getContent());
+        }
+
+        return false;
     }
 
     abstract public function search(String $seacrh,$verifiedOnly=false);

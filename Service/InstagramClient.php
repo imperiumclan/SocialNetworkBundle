@@ -2,6 +2,7 @@
 
 namespace ICS\SocialNetworkBundle\Service;
 
+use ICS\SocialNetworkBundle\Entity\Instagram\AbstractInstagramMedia;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramAccount;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use ICS\SocialNetworkBundle\Entity\Instagram\SearchResult;
@@ -17,7 +18,7 @@ class InstagramClient extends AbstractSocialClient
      * @var string
      */
     private $apiEndPoint='https://www.instagram.com/graphql/query/';
-    
+
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container,"Instagram");
@@ -34,7 +35,7 @@ class InstagramClient extends AbstractSocialClient
 
             $content = $response->getContent();
             $content=json_decode($content);
-            
+
             foreach($content->users as $user)
             {
                 $result=new InstagramSimpleAccount($user->user);
@@ -42,18 +43,18 @@ class InstagramClient extends AbstractSocialClient
                 {
                     if($result->isVerified())
                     {
-                        $results[]=$result;    
+                        $results[]=$result;
                     }
                 }
                 else
                 {
-                    $results[]=$result;           
+                    $results[]=$result;
                 }
-                
+
             }
 
         }
-    
+
         return $results;
     }
 
@@ -73,21 +74,21 @@ class InstagramClient extends AbstractSocialClient
 
         if($finalSearchAccount!=null)
         {
-            
+
             $url=$finalSearchAccount->getApiUrl();
             $response=$this->client->request('GET',$url);
 
             if($response->getStatusCode()== 200) {
 
                 $instagramResponse = json_decode($response->getContent());
-                
+
                 $result=new InstagramAccount($instagramResponse->graphql->user);
 
                 $result=$this->updateAccountPublications($result);
 
                 dump($result);
-                
-                
+
+
             }
         }
 
@@ -101,13 +102,22 @@ class InstagramClient extends AbstractSocialClient
             'variables' => '{"id":"'.$account->getId().'","first":"50"}'
         );
         $url=$this->prepareRequest($options);
-        
+
         $response=$this->client->request('GET',$url);
 
         if($response->getStatusCode()== 200) {
 
             $accountPublications=json_decode($response->getContent());
+
             dump($accountPublications);
+
+            foreach($accountPublications->data->user->edge_owner_to_timeline_media->edges as $medias)
+            {
+                $publications[]=AbstractInstagramMedia::getMedia($medias->node,$this);
+            }
+
+            dump($publications);
+
 
         }
 
