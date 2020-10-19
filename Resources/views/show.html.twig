@@ -1,0 +1,22 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="media my-3">
+                <img height= "64px" class="rounded-circle mr-3" src="{{ result.profilePicUrl }}"/>
+                <div class="media-body">
+                    <h2 class="media-title">{{ result.fullname }}</h2>
+                    <p>{{ result.biography }}</p>
+                </div>
+                <div class="media-right">
+                    <span class="badge badge-dark">{{  result.username }} / {{  result.id }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+{% endblock %}

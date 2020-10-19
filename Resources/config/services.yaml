@@ -1,0 +1,22 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  ICS\SocialNetworkBundle\Controller\:
+    resource: "../../Controller"
+    tags: ['controller.service_arguments']
+  ICS\SocialNetworkBundle\Command\:
+    resource: "../../Command"
+    tags: ['controller.service_arguments']
+  ICS\SocialNetworkBundle\Service\:
+    resource: "../../Service"
+    tags: ['controller.service_arguments']
+  ICS\SocialNetworkBundle\Twig\:
+    resource: "../../Twig"
+    public: false
+    tags: ['twig.extension']
+  ICS\SocialNetworkBundle\Form\:
+    resource: "../../Form"
+    public: false
+    tags: ['controller.service_arguments']

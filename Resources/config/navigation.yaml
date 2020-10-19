@@ -1,0 +1,25 @@
+navigation:
+  navbars:
+    mainnav:
+      items:
+        social_network:
+          lib: Social Network
+          icon: fa fa-share-alt
+          route: ics_social_homepage
+          childs:
+            social_homepage:
+              lib: Dashboard
+              icon: fas fa-columns
+              route: ics_social_homepage
+            divider1:
+              lib: divider
+            social_instagram:
+              lib: Instagram
+              icon: fab fa-instagram
+              route: ics_social_homepage
+            social_tiktok:
+              lib: TikTok
+              icon: fab fa-tiktok
+              route: ics_social_homepage
+          roles:
+              - ROLE_ADMIN
