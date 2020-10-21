@@ -2,13 +2,42 @@
 
 namespace ICS\SocialNetworkBundle\Entity\Instagram;
 
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity()
+ * @ORM\HasLifecycleCallbacks()
+ * @ORM\Table(schema="socialnetwork")
+ * @ORM\MappedSuperclass
+ * @ORM\InheritanceType("JOINED")
+ * @ORM\DiscriminatorColumn(name="discr", type="string")
+*/
 class InstagramSimpleAccount
 {
+    /**
+     * @ORM\Column(type="integer")
+     * @ORM\Id
+     */
     protected $id;
+    /**
+     * @ORM\Column(type="string")
+     */
     protected $username;
+    /**
+     * @ORM\Column(type="string")
+     */
     protected $fullname;
+    /**
+     * @ORM\Column(type="string")
+     */
     protected $profilePicUrl;
+    /**
+     * @ORM\Column(type="boolean")
+     */
     protected $private;
+    /**
+     * @ORM\Column(type="boolean")
+     */
     protected $verified;
 
     public function __construct($jsonResult)

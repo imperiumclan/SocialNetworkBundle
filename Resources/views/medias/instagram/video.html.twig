@@ -1,0 +1,8 @@
+{% extends "@SocialNetwork/medias/instagram/medias.html.twig" %}
+
+{% block cardImage %}
+    <video class="card-img-top" controls>
+        <source src="{{ media.videoUrl }}" type="video/mp4"/>
+         Sorry, your browser doesn't support embedded videos.
+    </video>
+{% endblock %}

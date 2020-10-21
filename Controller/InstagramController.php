@@ -13,37 +13,44 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class DefaultController extends AbstractController
+class InstagramController extends AbstractController
 {
     /**
-     * @Route("/" , name="ics_social_homepage")
+     * @Route("/instagram" , name="ics_social_instagram_homepage")
      */
     public function index(Request $request,InstagramClient $client)
     {
-       
+        $search = $request->get('search');
+        $result = array();
+        
+        if($search!=null)
+        {
+            $result=$client->search($search);
+        }
 
 
-        return $this->render('@SocialNetwork/index.html.twig',array(
-       
+        return $this->render('@SocialNetwork/instagram/index.html.twig',array(
+            "debug" => $result,
+            "search" => $search
         ));
        
     }
 
-
-
     /**
-     * @Route("/twitter" , name="ics_social_twitter")
+     * @Route("/instagram/{id}" , name="ics_social_instagram_account")
      */
-    public function searchTwitter(TwitterClient $client)
+    public function showAccount(InstagramClient $client, $id)
     {
-        $result="";
-        $client->search('bellathorne');
+
+        $result=$client->getAccount($id);
+
+        $client->updateAccount($result);
         
-        return $this->render('@SocialNetwork/show.html.twig',array(
+        return $this->render('@SocialNetwork/instagram/show.html.twig',array(
             "result" => $result,
         ));
        
     }
 
-    
+
 }

@@ -5,12 +5,25 @@ namespace ICS\SocialNetworkBundle\Entity\Instagram;
 use Doctrine\Common\Collections\ArrayCollection;
 use ICS\SocialNetworkBundle\Service\InstagramClient;
 
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity()
+ * @ORM\HasLifecycleCallbacks()
+ * @ORM\Table(schema="socialnetwork")
+ */
 class InstagramSideCar extends AbstractInstagramMedia
 {
+    /**
+     * @ORM\ManyToMany(targetEntity="ICS\MediaBundle\Entity\MediaImage")
+     */
     private $images;
+    /**
+     * @ORM\Column(type="json")
+     */
     private $imagesUrls;
 
-    public function __construct($jsonResult,InstagramClient $client=null)
+    public function __construct($jsonResult=null,InstagramClient $client=null)
     {
         parent::__construct($jsonResult);
         $this->images = new ArrayCollection();
@@ -22,7 +35,22 @@ class InstagramSideCar extends AbstractInstagramMedia
             {
                 $this->imagesUrls->add($sidecar->node->display_url);
             }
-            //dump($response);
         }
+    }
+
+    /**
+     * Get the value of images
+     */ 
+    public function getImages()
+    {
+        return $this->images;
+    }
+
+    /**
+     * Get the value of imagesUrls
+     */ 
+    public function getImagesUrls()
+    {
+        return $this->imagesUrls;
     }
 }

@@ -1,0 +1,88 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="media my-3">
+                <img height= "64px" class="rounded-circle mr-3" src="{{ result.profilePicUrl }}"/>
+                <div class="media-body">
+                    <h2 class="media-title">
+                        {{ result.fullname }} 
+                        {% if result.verified %}
+                            <small class="badge badge-success"><i class="far fa-thumbs-up"></i></small>
+                        {% endif %}
+                        <small class="badge badge-primary">{{ result.followerCount|number_format()}} followers</small>
+                    </h2>
+                    <p>{{ result.biography|raw }}</p>
+
+                    {% if result.externalUrl %}
+                        <a class="btn btn-primary" href="{{ result.externalUrl }}" title="{{ result.externalUrl }}" target="_blank">
+                            <i class="fa fa-globe"></i> Go to Site
+                        </a>
+                    {% endif %}
+                    <div class="btn-group float-right">
+                        {% if result.profilePicUrl is null %}
+                            <a class="btn btn-primary" href="#"><i class="fa fa-download"></i> Download</a>
+                        {% else %}
+                            <a class="btn btn-primary" href="#"><i class="fa fa-sync"></i> Update</a>
+                        {% endif %}
+                        
+                        
+                        <a class="btn btn-secondary" href="https://www.instagram.com/{{ result.username }}"><i class="fab fa-instagram"></i> View on Instagram</a>
+                    </div>
+                    
+                    
+                </div>
+                <div class="media-right">
+                    <span class="badge badge-dark">{{  result.username }} / {{  result.id }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {# <div class="row">  
+        <div class="col-12">
+            {{ dump(result) }}
+        </div>
+    </div> #}
+    <div class="row">
+        <div class="col-9">
+            <div class="row">
+                <div class="col-12">
+                    <h3>Content</h3>
+                </div>
+            </div>
+            <div class="row">
+                {% for publications in result.publications|batch(4) %}
+                        <div class="card-deck">
+                            {% for publication in publications %}
+                                {{ publication|instagramMedia }}
+                            {% endfor %}
+                        </div>
+                {% endfor %}
+            </div>
+        </div>
+         <div class="col-3">
+            <div class="row">
+                <div class="col-12">
+                    <h3>Related Accounts</h3>
+                </div>
+                {% for related in result.relatedProfiles %}
+                        <div class="col-12 col-md-6">    
+                            <div class="card">
+                                <img class="card-img-top" src="{{ related.profilePicUrl }}"/>
+                                <div class="card-body">
+                                    <div class="card-title">
+                                        <a href="{{ path('ics_social_instagram_account',{id: related.username }) }}">{{ related.fullname }}</a>
+                                    </div>
+                                    <div class="text-muted">{{ related.username }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

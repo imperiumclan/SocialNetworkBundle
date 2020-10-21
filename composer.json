@@ -3,7 +3,7 @@
     "description": "Social Network Management",
     "type": "symfony-bundle",
     "version": "1.0.0",
-    "licence": "MIT",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "ICS\\SocialNetworkBundle\\" : "/"
@@ -12,7 +12,13 @@
     "require": {
         "php": "^7.2.5",
         "symfony/framework-bundle": "5.1.*",
-        "imperiumclan/navigation-bundle" : "1.0.*"
+        "imperiumclan/navigation-bundle" : "1.0.*",
+        "imperiumclan/media-bundle" : "1.0.*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        }
     }
-
 }

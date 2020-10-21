@@ -5,18 +5,50 @@ namespace ICS\SocialNetworkBundle\Entity\Instagram;
 use DateTime;
 use ICS\SocialNetworkBundle\Service\InstagramClient;
 
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity()
+ * @ORM\HasLifecycleCallbacks()
+ * @ORM\Table()
+ * @ORM\MappedSuperclass
+ * @ORM\InheritanceType("JOINED")
+ * @ORM\DiscriminatorColumn(name="discr", type="string")
+*/
 abstract class AbstractInstagramMedia {
 
     protected const INSTAGRAM_MEDIA_IMAGE = "GraphImage";
     protected const INSTAGRAM_MEDIA_VIDEO = "GraphVideo";
     protected const INSTAGRAM_MEDIA_SIDECAR = "GraphSidecar";
 
+    /**
+     * @ORM\Column(type="integer")
+     * @ORM\Id
+     */
     private $id;
+    /**
+     * @ORM\Column(type="string")
+     */
     private $shortCode;
+    /**
+     * @ORM\Column(type="datetime")
+     */
     private $takenDate;
+    /**
+     * @ORM\Column(type="text")
+     */
     private $text;
+    /**
+     * @ORM\Column(type="string")
+     */
     private $previewUrl;
+    /**
+     * @ORM\Column(type="integer")
+     */
     private $likeCount;
+    /**
+     * @ORM\Column(type="integer")
+     */
     private $commentCount;
 
     public function __construct($jsonResult=null)
@@ -111,5 +143,13 @@ abstract class AbstractInstagramMedia {
     public function getMediaApiUrl()
     {
         return "https://www.instagram.com/p/".$this->shortCode."/?__a=1";
+    }
+
+    /**
+     * Get the value of text
+     */ 
+    public function getText()
+    {
+        return $this->text;
     }
 }

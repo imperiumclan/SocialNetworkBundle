@@ -7,6 +7,9 @@ use Twig\Environment;
 use Doctrine\ORM\EntityManagerInterface;
 use ICS\MediaBundle\Entity\MediaFile;
 use ICS\MediaBundle\Entity\MediaImage;
+use ICS\SocialNetworkBundle\Entity\Instagram\InstagramImage;
+use ICS\SocialNetworkBundle\Entity\Instagram\InstagramSideCar;
+use ICS\SocialNetworkBundle\Entity\Instagram\InstagramVideo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twig\TwigFilter;
 
@@ -33,7 +36,7 @@ class SocialNetworkExtension extends AbstractExtension
     public function getFilters()
     {
         return [
-            new TwigFilter('mediaType', [$this,'MediaType'],array(
+            new TwigFilter('instagramMedia', [$this,'instagramMedia'],array(
                 'is_safe' => array('html'),
                 'needs_environment' => true
             ))
@@ -46,14 +49,24 @@ class SocialNetworkExtension extends AbstractExtension
         return [];
     }
 
-    public function MediaType(Environment $env, $file)
+    public function instagramMedia(Environment $env, $media)
     {
-        if(is_a($file,MediaImage::class))
-        {
-            return 'image';
-        }
+       switch(get_class($media))
+       {
+            case InstagramVideo::class :
+                $view="@SocialNetwork/medias/instagram/video.html.twig";
+            break;
+            case InstagramSideCar::class :
+                $view="@SocialNetwork/medias/instagram/sidecar.html.twig";
+            break;
+            default :
+                $view="@SocialNetwork/medias/instagram/image.html.twig";
+            break;
+       }
 
-        return 'file';
+       return $env->render($view,array(
+           'media' => $media,
+       ));
     }
 
 }

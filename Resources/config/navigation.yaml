@@ -16,7 +16,7 @@ navigation:
             social_instagram:
               lib: Instagram
               icon: fab fa-instagram
-              route: ics_social_homepage
+              route: ics_social_instagram_homepage
             social_tiktok:
               lib: TikTok
               icon: fab fa-tiktok

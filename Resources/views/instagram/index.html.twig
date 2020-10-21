@@ -1,0 +1,44 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <h1><i class="fa fa-share-alt"></i> Welcome to Instagram Network Dashboard</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <form method="POST">
+                    <div class="input-group">
+                    <input class="form-control" type="text" name="search" value="{{ search }}" placeholder="Rechercher sur Instagram"/>
+                        <div class="input-group-append input-group-btn">
+                            <button class="btn btn-primary" type="submit" title="Seacrh"><i class="fa fa-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                
+                    {% for items in debug|batch(4) %}
+                        <div class="card-deck mt-3">
+                            {% for item in items %}
+                                <div class="card">
+                                    <img class="card-img-top" src="{{ item.profilePicUrl }}"/>
+                                    <div class="card-body">
+                                        <div class="card-title">
+                                            <a href="{{ path('ics_social_instagram_account',{id: item.username }) }}">{{ item.fullname }}</a>
+                                        </div>
+                                        <div class="text-muted">{{ item.username }}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                
+            </div>
+        </div>
+    </div>
+{% endblock %}
