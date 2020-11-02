@@ -1,5 +1,11 @@
 {% extends "@SocialNetwork/medias/instagram/medias.html.twig" %}
 
 {% block cardImage %}
-    <img class="card-img-top" src="{{ media.previewUrl }}"/>
+    {% if media.image is not null %}
+        <img class="card-img-top" src="{{ asset(media.image.assetPath) }}"/>
+    {% else %}
+        <img class="card-img-top" src="{{ media.previewUrl }}"/>    
+    {% endif %}
+    
+    
 {% endblock %}

@@ -22,8 +22,8 @@
                         </a>
                     {% endif %}
                     <div class="btn-group float-right">
-                        {% if result.profilePicUrl is null %}
-                            <a class="btn btn-primary" href="#"><i class="fa fa-download"></i> Download</a>
+                        {% if result.profilePic is null %}
+                            <a class="btn btn-primary" href="{{ path('ics_social_instagram_account_download',{ id: result.username}) }}"><i class="fa fa-download"></i> Download</a>
                         {% else %}
                             <a class="btn btn-primary" href="#"><i class="fa fa-sync"></i> Update</a>
                         {% endif %}

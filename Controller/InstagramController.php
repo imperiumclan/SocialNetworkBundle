@@ -44,15 +44,35 @@ class InstagramController extends AbstractController
      */
     public function showAccount(InstagramClient $client, $id)
     {
+        
+        $result=$this->getDoctrine()
+                        ->getRepository(InstagramAccount::class)
+                        ->findOneBy([
+                            'username' => $id
+                        ]);
 
-        $result=$client->getAccount($id);
+        if($result==null)
+        {
+            $result=$client->getAccount($id);
+        }
 
-        $client->updateAccount($result);
+        //
 
         return $this->render('@SocialNetwork/instagram/show.html.twig',array(
             "result" => $result,
         ));
 
+    }
+
+    /**
+     * @Route("/instagram/{id}/download" , name="ics_social_instagram_account_download")
+     */
+    public function downloadAccount(InstagramClient $client, $id)
+    {
+        $result=$client->getAccount($id);
+        $client->updateAccount($result);
+
+        return $this->redirectToRoute('ics_social_instagram_account',['id' => $id]);
     }
 
 

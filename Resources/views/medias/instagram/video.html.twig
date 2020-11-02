@@ -2,7 +2,11 @@
 
 {% block cardImage %}
     <video class="card-img-top" controls>
-        <source src="{{ media.videoUrl }}" type="video/mp4"/>
+        {% if media.video is not null %}
+            <source src="{{ asset(media.video.assetPath) }}" type="video/mp4"/>
+        {% else %}
+            <source src="{{ media.videoUrl }}" type="video/mp4"/>
+        {% endif %}
          Sorry, your browser doesn't support embedded videos.
     </video>
 {% endblock %}

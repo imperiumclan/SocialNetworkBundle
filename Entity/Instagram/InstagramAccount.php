@@ -135,4 +135,14 @@ class InstagramAccount extends InstagramSimpleAccount
     {
         return $this->relatedProfiles;
     }
+
+    public function __toString()
+    {
+        if($this->getFullname()!="")
+        {
+            return $this->getFullname();
+        }
+
+        return $this->getUsername();
+    }
 }

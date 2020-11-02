@@ -1,9 +1,16 @@
 {% extends "@SocialNetwork/medias/instagram/medias.html.twig" %}
 
 {% block cardImage %}
+    {% set images = media.imagesUrls %}
+
+    {% if media.images|length > 0 %}
+        {% set images = media.images %}
+    {% endif %}
+    
+
     <div id="carousel-{{ media.id }}" class="carousel slide card-img-top" data-ride="carousel">
         <ol class="carousel-indicators">
-            {% for url in media.imagesUrls %}
+            {% for url in images %}
                 {% if loop.first %}
                     {% set active = "active" %}
                 {% else %}
@@ -13,14 +20,18 @@
             {% endfor %}
         </ol>
         <div class="carousel-inner">
-            {% for url in media.imagesUrls %}
+            {% for url in images %}
                 {% if loop.first %}
                     {% set active = "active" %}
                 {% else %}
                     {% set active = "" %}
                 {% endif %}
-                <div class="carousel-item {{ active }}">    
-                    <img src="{{ url }}" class="d-block w-100">                
+                <div class="carousel-item {{ active }}">  
+                    {% if media.images|length > 0 %}
+                        <img src="{{ asset(url.assetPath) }}" class="d-block w-100">                
+                    {% else %}
+                        <img src="{{ url }}" class="d-block w-100">                
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>

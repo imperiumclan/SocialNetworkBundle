@@ -12,9 +12,14 @@
                 <h2>Saved Accounts</h2>
                 <ul class="list-group">
                 {% for account in accounts %}
-                    <li class="list-group-item">
-                        <img height="64" class="rounded-circle" src="{{ asset(account.profilePic.assetPath) }}"/>
-                        {{ account.username }}
+                    <li class="list-group-item media">
+                        <div class="media">
+                            <img height="64" class="rounded-circle mr-3" src="{{ asset(account.profilePic.assetPath) }}"/>
+                            <div class="media-body">
+                                <h4><a href="{{  path('ics_social_instagram_account',{ id : account.username}) }}">{{ account }}</a></h4>
+                                <div class="text-muted">{{ account.username }} - {{ account.publications|length }} publications</div>
+                            </div>
+                        </div>
                     </li>
                 {% endfor %}
                 </ul>
