@@ -22,7 +22,7 @@ abstract class AbstractInstagramMedia {
     protected const INSTAGRAM_MEDIA_SIDECAR = "GraphSidecar";
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="bigint")
      * @ORM\Id
      */
     private $id;
@@ -35,11 +35,11 @@ abstract class AbstractInstagramMedia {
      */
     private $takenDate;
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text",nullable=true)
      */
     private $text;
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", length=2048)
      */
     private $previewUrl;
     /**
@@ -50,6 +50,10 @@ abstract class AbstractInstagramMedia {
      * @ORM\Column(type="integer")
      */
     private $commentCount;
+    /**
+     * @ORM\ManyToOne(targetEntity="ICS\MediaBundle\Entity\MediaImage",cascade={"persist","remove"})
+     */
+    private $image;
 
     public function __construct($jsonResult=null)
     {
@@ -147,9 +151,29 @@ abstract class AbstractInstagramMedia {
 
     /**
      * Get the value of text
-     */ 
+     */
     public function getText()
     {
         return $this->text;
+    }
+
+    /**
+     * Get the value of image
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * Set the value of image
+     *
+     * @return  self
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
+
+        return $this;
     }
 }

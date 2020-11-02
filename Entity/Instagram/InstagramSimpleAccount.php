@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 class InstagramSimpleAccount
 {
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="bigint")
      * @ORM\Id
      */
     protected $id;
@@ -24,11 +24,11 @@ class InstagramSimpleAccount
      */
     protected $username;
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string",length=2048)
      */
     protected $fullname;
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string",length=2048)
      */
     protected $profilePicUrl;
     /**
@@ -59,7 +59,7 @@ class InstagramSimpleAccount
 
     /**
      * Get the value of id
-     */ 
+     */
     public function getId()
     {
         return $this->id;
@@ -67,7 +67,7 @@ class InstagramSimpleAccount
 
     /**
      * Get the value of username
-     */ 
+     */
     public function getUsername()
     {
         return $this->username;
@@ -75,7 +75,7 @@ class InstagramSimpleAccount
 
     /**
      * Get the value of fullname
-     */ 
+     */
     public function getFullname()
     {
         return $this->fullname;
@@ -83,7 +83,7 @@ class InstagramSimpleAccount
 
     /**
      * Get the value of profilePicUrl
-     */ 
+     */
     public function getProfilePicUrl()
     {
         return $this->profilePicUrl;
@@ -91,7 +91,7 @@ class InstagramSimpleAccount
 
     /**
      * Get the value of isPrivate
-     */ 
+     */
     public function isPrivate()
     {
         return $this->private;
@@ -99,7 +99,7 @@ class InstagramSimpleAccount
 
     /**
      * Get the value of isVefified
-     */ 
+     */
     public function isVerified()
     {
         return $this->verified;

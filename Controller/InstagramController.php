@@ -5,6 +5,7 @@ namespace ICS\SocialNetworkBundle\Controller;
 use ICS\MediaBundle\Entity\MediaFile;
 use ICS\MediaBundle\Entity\MediaImage;
 use ICS\MediaBundle\Form\Type\MediaFileType;
+use ICS\SocialNetworkBundle\Entity\Instagram\InstagramAccount;
 use ICS\SocialNetworkBundle\Service\InstagramClient;
 use ICS\SocialNetworkBundle\Service\TwitterClient;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,18 +23,20 @@ class InstagramController extends AbstractController
     {
         $search = $request->get('search');
         $result = array();
-        
+
         if($search!=null)
         {
             $result=$client->search($search);
         }
 
+        $accounts=$this->getDoctrine()->getRepository(InstagramAccount::class)->findAll();
 
         return $this->render('@SocialNetwork/instagram/index.html.twig',array(
             "debug" => $result,
-            "search" => $search
+            "search" => $search,
+            "accounts" => $accounts
         ));
-       
+
     }
 
     /**
@@ -45,11 +48,11 @@ class InstagramController extends AbstractController
         $result=$client->getAccount($id);
 
         $client->updateAccount($result);
-        
+
         return $this->render('@SocialNetwork/instagram/show.html.twig',array(
             "result" => $result,
         ));
-       
+
     }
 
 

@@ -18,7 +18,7 @@ class InstagramVideo extends AbstractInstagramMedia
      */
     private $videoUrl;
     /**
-     * @ORM\ManyToOne(targetEntity="ICS\MediaBundle\Entity\MediaVideo")
+     * @ORM\ManyToOne(targetEntity="ICS\MediaBundle\Entity\MediaVideo",cascade={"persist","remove"})
      */
     private $video;
 
@@ -35,7 +35,7 @@ class InstagramVideo extends AbstractInstagramMedia
 
     /**
      * Get the value of videoUrl
-     */ 
+     */
     public function getVideoUrl()
     {
         return $this->videoUrl;
@@ -43,9 +43,21 @@ class InstagramVideo extends AbstractInstagramMedia
 
     /**
      * Get the value of video
-     */ 
+     */
     public function getVideo()
     {
         return $this->video;
+    }
+
+    /**
+     * Set the value of video
+     *
+     * @return  self
+     */
+    public function setVideo($video)
+    {
+        $this->video = $video;
+
+        return $this;
     }
 }

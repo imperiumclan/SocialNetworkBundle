@@ -7,7 +7,11 @@ use ICS\SocialNetworkBundle\Entity\Instagram\InstagramAccount;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramSimpleAccount;
 use ICS\MediaBundle\Service\MediaClient;
+use ICS\SocialNetworkBundle\Entity\Instagram\InstagramImage;
+use ICS\SocialNetworkBundle\Entity\Instagram\InstagramSideCar;
+use ICS\SocialNetworkBundle\Entity\Instagram\InstagramVideo;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 class InstagramClient extends AbstractSocialClient
 {
@@ -21,10 +25,13 @@ class InstagramClient extends AbstractSocialClient
 
     private $mediaClient;
 
-    public function __construct(ContainerInterface $container)
+    private $doctrine;
+
+    public function __construct(ContainerInterface $container,MediaClient $client,EntityManagerInterface $doctrine)
     {
         parent::__construct($container,"Instagram");
-        //$this->mediaClient = $client;
+        $this->mediaClient = $client;
+        $this->doctrine=$doctrine;
     }
 
     public function search(String $search,$verifiedOnly=false)
@@ -64,7 +71,7 @@ class InstagramClient extends AbstractSocialClient
     public function getAccount(string $username)
     {
         $finalSearchAccount=null;
-        
+
         $username=trim(strtolower($username));
 
         foreach($this->search($username) as $account)
@@ -87,7 +94,7 @@ class InstagramClient extends AbstractSocialClient
 
                 $result=new InstagramAccount($instagramResponse->graphql->user);
 
-                $result=$this->updateAccountPublications($result);
+                $result=$this->updateAccountPublications($result,12);
 
                 //dump($result);
 
@@ -99,10 +106,10 @@ class InstagramClient extends AbstractSocialClient
     }
 
 
-    public function updateAccountPublications(InstagramAccount $account)
+    public function updateAccountPublications(InstagramAccount $account,int $nbpublications=50)
     {
         $options=array(
-            'variables' => '{"id":"'.$account->getId().'","first":"8"}'
+            'variables' => '{"id":"'.$account->getId().'","first":"'.$nbpublications.'"}'
         );
         $url=$this->prepareRequest($options);
 
@@ -125,7 +132,7 @@ class InstagramClient extends AbstractSocialClient
 
 
     static public function TransformToLink(string $text)
-    {   
+    {
         // Gestion des #tag
         preg_match_all("/(#\w+)/u", $text, $matches);
         foreach($matches[0] as $tag)
@@ -147,20 +154,46 @@ class InstagramClient extends AbstractSocialClient
 
     public function updateAccount(InstagramAccount $account)
     {
-        // $basepath = $this->mediaClient->getBasePath();
+        $basepath = $this->mediaClient->getBasePath();
 
-        // $this->createAccountPath($account);
+        $this->createAccountPath($account);
 
-        // $accountBasePath = $basepath."/socialNetwork/Instagram/".$account->getUsername()."/";
-        // $imageBasePath = $basepath."socialNetwork/Instagram/".$account->getUsername()."/images";
-        // $sidecarBasePath = $basepath."socialNetwork/Instagram/".$account->getUsername()."/sidecars";
-        // $videoBasePath = $basepath."socialNetwork/Instagram/".$account->getUsername()."/videos";
+        $accountBasePath = $basepath."/socialNetwork/Instagram/".$account->getUsername()."/";
+        $imageBasePath = $basepath."/socialNetwork/Instagram/".$account->getUsername()."/images";
+        $sidecarBasePath = $basepath."/socialNetwork/Instagram/".$account->getUsername()."/sidecars";
+        $videoBasePath = $basepath."/socialNetwork/Instagram/".$account->getUsername()."/videos";
 
-    
-        // //Download Profile Picture
-        // $account->setProfilePic($this->mediaClient->DownloadImage($account->getProfilePicUrl(),$accountBasePath.'/profile_pic.jpeg'));
+        // Download Profile Picture
+        $account->setProfilePic($this->mediaClient->DownloadImage($account->getProfilePicUrl(),$accountBasePath.'/profile_pic.jpeg'));
 
 
+        // Save publications data
+        foreach($account->getPublications() as $publication)
+        {
+            if(is_a($publication,InstagramVideo::class))
+            {
+                $publication->setVideo($this->mediaClient->DownloadVideo($publication->getVideoUrl(),$videoBasePath.'/'.$publication->getId().'.mp4'));
+            }
+            else if(is_a($publication,InstagramSideCar::class))
+            {
+                $i=1;
+                foreach($publication->getimagesUrls() as $imgUrl)
+                {
+                    $path=$sidecarBasePath.'/'.$publication->getId();
+                    if(!file_exists($path))
+                    {
+                        mkdir($path,0777,true);
+                    }
+                    $publication->getImages()->add($this->mediaClient->DownloadImage($imgUrl,$path.'/'.$i.'.jpg'));
+                    $i++;
+                }
+            }
+
+            $publication->setImage($this->mediaClient->DownloadImage($publication->getPreviewUrl(),$imageBasePath.'/'.$publication->getId().'.jpg'));
+        }
+
+       $this->doctrine->persist($account);
+       $this->doctrine->flush();
     }
 
     private function createAccountPath(InstagramAccount $account)

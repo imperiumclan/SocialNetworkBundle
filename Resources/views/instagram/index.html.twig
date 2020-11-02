@@ -7,8 +7,22 @@
                 <h1><i class="fa fa-share-alt"></i> Welcome to Instagram Network Dashboard</h1>
             </div>
         </div>
+         <div class="row">
+            <div class="col-12">
+                <h2>Saved Accounts</h2>
+                <ul class="list-group">
+                {% for account in accounts %}
+                    <li class="list-group-item">
+                        <img height="64" class="rounded-circle" src="{{ asset(account.profilePic.assetPath) }}"/>
+                        {{ account.username }}
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
         <div class="row">
             <div class="col-12">
+                <h2>Search Accounts</h2>
                 <form method="POST">
                     <div class="input-group">
                     <input class="form-control" type="text" name="search" value="{{ search }}" placeholder="Rechercher sur Instagram"/>
@@ -21,7 +35,7 @@
         </div>
         <div class="row">
             <div class="col-12">
-                
+
                     {% for items in debug|batch(4) %}
                         <div class="card-deck mt-3">
                             {% for item in items %}
@@ -37,7 +51,7 @@
                             {% endfor %}
                         </div>
                     {% endfor %}
-                
+
             </div>
         </div>
     </div>

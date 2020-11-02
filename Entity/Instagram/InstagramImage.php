@@ -11,11 +11,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class InstagramImage extends AbstractInstagramMedia
 {
-    /**
-     * @ORM\ManyToOne(targetEntity="ICS\MediaBundle\Entity\MediaImage")
-     */
-    private $image;
-
     public function __construct($jsonResult=null)
     {
         parent::__construct($jsonResult);

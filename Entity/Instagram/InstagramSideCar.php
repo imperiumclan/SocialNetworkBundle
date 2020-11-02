@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 class InstagramSideCar extends AbstractInstagramMedia
 {
     /**
-     * @ORM\ManyToMany(targetEntity="ICS\MediaBundle\Entity\MediaImage")
+     * @ORM\ManyToMany(targetEntity="ICS\MediaBundle\Entity\MediaImage",cascade={"persist","remove"})
      */
     private $images;
     /**
@@ -40,7 +40,7 @@ class InstagramSideCar extends AbstractInstagramMedia
 
     /**
      * Get the value of images
-     */ 
+     */
     public function getImages()
     {
         return $this->images;
@@ -48,7 +48,7 @@ class InstagramSideCar extends AbstractInstagramMedia
 
     /**
      * Get the value of imagesUrls
-     */ 
+     */
     public function getImagesUrls()
     {
         return $this->imagesUrls;

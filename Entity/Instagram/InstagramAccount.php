@@ -11,25 +11,25 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(schema="socialnetwork")
  */
 class InstagramAccount extends InstagramSimpleAccount
-{   
+{
     /**
-     * @ORM\ManyToOne(targetEntity="ICS\MediaBundle\Entity\MediaImage")
-     */ 
+     * @ORM\ManyToOne(targetEntity="ICS\MediaBundle\Entity\MediaImage",cascade={"persist","remove"})
+     */
     private $profilePic=null;
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string",nullable=true)
      */
     private $facebookPage=null;
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text",nullable=true)
      */
     private $biography;
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string",nullable=true)
      */
     private $externalUrl;
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="bigint")
      */
     private $FollowerCount;
     /**
@@ -37,7 +37,7 @@ class InstagramAccount extends InstagramSimpleAccount
      */
     private $relatedProfiles;
     /**
-     * @ORM\ManyToMany(targetEntity="ICS\SocialNetworkBundle\Entity\Instagram\AbstractInstagramMedia")
+     * @ORM\ManyToMany(targetEntity="ICS\SocialNetworkBundle\Entity\Instagram\AbstractInstagramMedia",cascade={"persist","remove"})
      */
     private $publications;
 
@@ -50,7 +50,7 @@ class InstagramAccount extends InstagramSimpleAccount
         $this->publications = new ArrayCollection();
 
         $this->biography = InstagramClient::TransformToLink($jsonResult->biography);
-        
+
         $this->FollowerCount = $jsonResult->edge_followed_by->count;
         $this->externalUrl = $jsonResult->external_url;
 
@@ -65,12 +65,12 @@ class InstagramAccount extends InstagramSimpleAccount
         {
             $this->relatedProfiles->add(new InstagramSimpleAccount($relatedUser->node));
         }
-        
+
     }
 
     /**
      * Get the value of biography
-     */ 
+     */
     public function getBiography()
     {
         return $this->biography;
@@ -78,7 +78,7 @@ class InstagramAccount extends InstagramSimpleAccount
 
     /**
      * Get the value of externalUrl
-     */ 
+     */
     public function getExternalUrl()
     {
         return $this->externalUrl;
@@ -86,7 +86,7 @@ class InstagramAccount extends InstagramSimpleAccount
 
     /**
      * Get the value of FollowerCount
-     */ 
+     */
     public function getFollowerCount()
     {
         return $this->FollowerCount;
@@ -94,7 +94,7 @@ class InstagramAccount extends InstagramSimpleAccount
 
     /**
      * Get the value of facebookPage
-     */ 
+     */
     public function getFacebookPage()
     {
         return $this->facebookPage;
@@ -102,7 +102,7 @@ class InstagramAccount extends InstagramSimpleAccount
 
     /**
      * Get the value of publications
-     */ 
+     */
     public function getPublications()
     {
         return $this->publications;
@@ -110,7 +110,7 @@ class InstagramAccount extends InstagramSimpleAccount
 
     /**
      * Get the value of profilePic
-     */ 
+     */
     public function getProfilePic()
     {
         return $this->profilePic;
@@ -120,7 +120,7 @@ class InstagramAccount extends InstagramSimpleAccount
      * Set the value of profilePic
      *
      * @return  self
-     */ 
+     */
     public function setProfilePic($profilePic)
     {
         $this->profilePic = $profilePic;
@@ -130,7 +130,7 @@ class InstagramAccount extends InstagramSimpleAccount
 
     /**
      * Get the value of relatedProfiles
-     */ 
+     */
     public function getRelatedProfiles()
     {
         return $this->relatedProfiles;
