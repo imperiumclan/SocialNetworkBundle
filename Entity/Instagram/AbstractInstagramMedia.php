@@ -6,6 +6,7 @@ use DateTime;
 use ICS\SocialNetworkBundle\Service\InstagramClient;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Mime\Encoder\Base64Encoder;
 
 /**
  * @ORM\Entity()
@@ -66,7 +67,7 @@ abstract class AbstractInstagramMedia {
             $this->takenDate=$takenDate;
             foreach($jsonResult->edge_media_to_caption->edges as $text)
             {
-                $this->text .= InstagramClient::TransformToLink($text->node->text)."\n";
+                $this->text .= InstagramClient::TransformToLink($text->node->text);   
             }
 
             $this->previewUrl =$jsonResult->display_url;
@@ -176,4 +177,6 @@ abstract class AbstractInstagramMedia {
 
         return $this;
     }
+
+    
 }

@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 class InstagramVideo extends AbstractInstagramMedia
 {
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", length=2048)
      */
     private $videoUrl;
     /**

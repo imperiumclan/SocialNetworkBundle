@@ -25,7 +25,7 @@
                         {% if result.profilePic is null %}
                             <a class="btn btn-primary" href="{{ path('ics_social_instagram_account_download',{ id: result.username}) }}"><i class="fa fa-download"></i> Download</a>
                         {% else %}
-                            <a class="btn btn-primary" href="#"><i class="fa fa-sync"></i> Update</a>
+                            <a class="btn btn-primary" href="#" title="Last update {{ result.LastUpdate|date('d/m/Y H:i')|default('never') }}"><i class="fa fa-sync"></i> Update</a>
                         {% endif %}
                         
                         
@@ -35,6 +35,7 @@
                     
                 </div>
                 <div class="media-right">
+                    <span class="badge badge-info">Last update {{ result.LastUpdate|date('d/m/Y H:i')|default('never') }}</span>
                     <span class="badge badge-dark">{{  result.username }} / {{  result.id }}</span>
                 </div>
             </div>
@@ -49,12 +50,12 @@
         <div class="col-9">
             <div class="row">
                 <div class="col-12">
-                    <h3>Content</h3>
+                    <h3>Publications</h3>
                 </div>
             </div>
             <div class="row">
                 {% for publications in result.publications|batch(4) %}
-                        <div class="card-deck">
+                        <div class="card-deck mt-3">
                             {% for publication in publications %}
                                 {{ publication|instagramMedia }}
                             {% endfor %}

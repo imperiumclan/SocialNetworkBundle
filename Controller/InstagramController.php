@@ -29,7 +29,7 @@ class InstagramController extends AbstractController
             $result=$client->search($search);
         }
 
-        $accounts=$this->getDoctrine()->getRepository(InstagramAccount::class)->findAll();
+        $accounts=$this->getDoctrine()->getRepository(InstagramAccount::class)->findBy([],['username' => 'ASC']);
 
         return $this->render('@SocialNetwork/instagram/index.html.twig',array(
             "debug" => $result,

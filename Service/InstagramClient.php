@@ -2,15 +2,14 @@
 
 namespace ICS\SocialNetworkBundle\Service;
 
+use DateTime;
 use ICS\SocialNetworkBundle\Entity\Instagram\AbstractInstagramMedia;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramAccount;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramSimpleAccount;
 use ICS\MediaBundle\Service\MediaClient;
-use ICS\SocialNetworkBundle\Entity\Instagram\InstagramImage;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramSideCar;
-use ICS\SocialNetworkBundle\Entity\Instagram\InstagramVideo;
-use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use ICS\SocialNetworkBundle\Entity\Instgram\InstagramVideo;
 use Doctrine\ORM\EntityManagerInterface;
 
 class InstagramClient extends AbstractSocialClient
@@ -95,10 +94,6 @@ class InstagramClient extends AbstractSocialClient
                 $result=new InstagramAccount($instagramResponse->graphql->user);
 
                 $result=$this->updateAccountPublications($result,12);
-
-                //dump($result);
-
-
             }
         }
 
@@ -119,11 +114,13 @@ class InstagramClient extends AbstractSocialClient
 
             $accountPublications=json_decode($response->getContent());
 
-            //dump($accountPublications);
-
             foreach($accountPublications->data->user->edge_owner_to_timeline_media->edges as $medias)
             {
-                $account->getPublications()->add(AbstractInstagramMedia::getMedia($medias->node,$this));
+                $media=AbstractInstagramMedia::getMedia($medias->node,$this);
+                if(!$this->publicationExist($account,$media))
+                {
+                    $account->getPublications()->add($media);
+                }
             }
         }
 
@@ -131,23 +128,36 @@ class InstagramClient extends AbstractSocialClient
     }
 
 
+    public function publicationExist(InstagramAccount $account,AbstractInstagramMedia $media)
+    {
+        foreach($account->getPublications() as $pub)
+        {
+            if($pub->getId()==$media->getId())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     static public function TransformToLink(string $text)
     {
         // Gestion des #tag
-        preg_match_all("/(#\w+)/u", $text, $matches);
+        preg_match_all("/(\s#\w+)/u", $text, $matches);
         foreach($matches[0] as $tag)
         {
             $text=str_replace($tag,'<a href="https://www.instagram.com/explore/tags/'.substr($tag,1).'" target="_blank">'.$tag.'</a>',$text);
         }
 
         // Gestion des @person
-        preg_match_all("/(@\w+)/u", $text, $matches);
+        preg_match_all("/(\s@\w+)/u", $text, $matches);
         foreach($matches[0] as $person)
         {
             $text=str_replace($person,'<a href="https://www.instagram.com/'.substr($person,1).'" target="_blank">'.$person.'</a>',$text);
         }
 
-        //TODO : Code Tag and Account transformation text
+        $text=str_replace("\n","<br/>",$text);
 
         return $text;
     }

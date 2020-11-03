@@ -36,6 +36,8 @@ class InstagramSideCar extends AbstractInstagramMedia
                 $this->imagesUrls->add($sidecar->node->display_url);
             }
         }
+
+        
     }
 
     /**

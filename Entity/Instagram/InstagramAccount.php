@@ -25,7 +25,7 @@ class InstagramAccount extends InstagramSimpleAccount
      */
     private $biography;
     /**
-     * @ORM\Column(type="string",nullable=true)
+     * @ORM\Column(type="string",length=2048,nullable=true)
      */
     private $externalUrl;
     /**
@@ -40,6 +40,15 @@ class InstagramAccount extends InstagramSimpleAccount
      * @ORM\ManyToMany(targetEntity="ICS\SocialNetworkBundle\Entity\Instagram\AbstractInstagramMedia",cascade={"persist","remove"})
      */
     private $publications;
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $lastUpdate;
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $active=true;
+
 
     public function __construct($jsonResult)
     {
@@ -144,5 +153,45 @@ class InstagramAccount extends InstagramSimpleAccount
         }
 
         return $this->getUsername();
+    }
+
+    /**
+     * Get the value of lastUpdate
+     */ 
+    public function getLastUpdate()
+    {
+        return $this->lastUpdate;
+    }
+
+    /**
+     * Set the value of lastUpdate
+     *
+     * @return  self
+     */ 
+    public function setLastUpdate($lastUpdate)
+    {
+        $this->lastUpdate = $lastUpdate;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of active
+     */ 
+    public function getActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * Set the value of active
+     *
+     * @return  self
+     */ 
+    public function setActive($active)
+    {
+        $this->active = $active;
+
+        return $this;
     }
 }
