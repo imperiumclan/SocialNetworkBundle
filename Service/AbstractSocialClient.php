@@ -13,10 +13,22 @@ abstract class AbstractSocialClient
 
     protected $container;
 
+    protected $headers;
+
     protected function __construct(ContainerInterface $container,string $socialNetworkName)
     {
         $store = new Store($container->getParameter('kernel.project_dir').'/var/cache/WebServices/'.$socialNetworkName.'/');
         $this->client=new CurlHttpClient();
+
+        $this->headers =[
+            'headers' => [
+                'Cache-Control' => 'no-cache',
+                'Connection' => 'keep-alive',
+                'Accept-Encoding' => 'gzip'
+            ],
+        ];
+        $this->headers=[];
+
         $this->client = new CachingHttpClient($this->client, $store);
         $this->container = $container;
     }

@@ -36,7 +36,7 @@ class InstagramClient extends AbstractSocialClient
     public function search(String $search,$verifiedOnly=false)
     {
         $url="https://www.instagram.com/web/search/topsearch/?query=".$search;
-        $response=$this->client->request('GET',$url);
+        $response=$this->client->request('GET',$url,$this->headers);
 
         $results=array();
 
@@ -85,7 +85,7 @@ class InstagramClient extends AbstractSocialClient
         {
 
             $url=$finalSearchAccount->getApiUrl();
-            $response=$this->client->request('GET',$url);
+            $response=$this->client->request('GET',$url,$this->headers);
 
             if($response->getStatusCode()== 200) {
 
@@ -108,7 +108,7 @@ class InstagramClient extends AbstractSocialClient
         );
         $url=$this->prepareRequest($options);
 
-        $response=$this->client->request('GET',$url);
+        $response=$this->client->request('GET',$url,$this->headers);
 
         if($response->getStatusCode()== 200) {
 
@@ -127,6 +127,44 @@ class InstagramClient extends AbstractSocialClient
         return $account;
     }
 
+    public function getFullPublications(InstagramAccount $account,int $nbpublications=50,string $endpointer=null)
+    {
+        $variables='{"id":"'.$account->getId().'","first":"'.$nbpublications.'"';
+
+        if($endpointer!=null)
+        {
+            $variables.=',"after":"'.$endpointer.'"';
+        }
+
+        $variables.='}';
+        $options=array(
+            'variables' => $variables
+        );
+        $url=$this->prepareRequest($options);
+
+        $response=$this->client->request('GET',$url,$this->headers);
+
+        if($response->getStatusCode()== 200) {
+
+            $accountPublications=json_decode($response->getContent());
+
+            foreach($accountPublications->data->user->edge_owner_to_timeline_media->edges as $medias)
+            {
+                $media=AbstractInstagramMedia::getMedia($medias->node,$this);
+                if(!$this->publicationExist($account,$media))
+                {
+                    $account->getPublications()->add($media);
+                }
+            }
+
+            if($accountPublications->data->user->edge_owner_to_timeline_media->page_info->has_next_page)
+            {
+                $this->getFullPublications($account,$nbpublications,$accountPublications->data->user->edge_owner_to_timeline_media->page_info->end_cursor);
+            }
+        }
+
+        return $account;
+    }
 
     public function publicationExist(InstagramAccount $account,AbstractInstagramMedia $media)
     {

@@ -67,8 +67,10 @@ abstract class AbstractInstagramMedia {
             $this->takenDate=$takenDate;
             foreach($jsonResult->edge_media_to_caption->edges as $text)
             {
-                $this->text .= InstagramClient::TransformToLink($text->node->text);   
+                $this->text .= InstagramClient::TransformToLink( preg_replace("/U\+([0-9A-F]{4})/", "&#x\\1;", $text->node->text));
             }
+
+            $this->text=utf8_encode($this->text);
 
             $this->previewUrl =$jsonResult->display_url;
             $this->likeCount = $jsonResult->edge_media_preview_like->count;
@@ -178,5 +180,5 @@ abstract class AbstractInstagramMedia {
         return $this;
     }
 
-    
+
 }

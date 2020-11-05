@@ -1,8 +1,9 @@
 <div class="card">
     {% block cardImage %}
-    
+
     {% endblock %}
     <div class="card-body" title="Identifiant de la publication : {{ media.id }}">
+        <div class="text-muted"><i class="fa fa-clock"></i> Taken date : {{ media.takenDate|date('d/m/Y H:i') }}</div>
         {{ media.text|raw }}
     </div>
 </div>

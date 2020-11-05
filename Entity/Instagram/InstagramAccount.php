@@ -38,6 +38,7 @@ class InstagramAccount extends InstagramSimpleAccount
     private $relatedProfiles;
     /**
      * @ORM\ManyToMany(targetEntity="ICS\SocialNetworkBundle\Entity\Instagram\AbstractInstagramMedia",cascade={"persist","remove"})
+     * @ORM\OrderBy({"takenDate"="DESC"})
      */
     private $publications;
     /**
@@ -157,7 +158,7 @@ class InstagramAccount extends InstagramSimpleAccount
 
     /**
      * Get the value of lastUpdate
-     */ 
+     */
     public function getLastUpdate()
     {
         return $this->lastUpdate;
@@ -167,7 +168,7 @@ class InstagramAccount extends InstagramSimpleAccount
      * Set the value of lastUpdate
      *
      * @return  self
-     */ 
+     */
     public function setLastUpdate($lastUpdate)
     {
         $this->lastUpdate = $lastUpdate;
@@ -177,7 +178,7 @@ class InstagramAccount extends InstagramSimpleAccount
 
     /**
      * Get the value of active
-     */ 
+     */
     public function getActive()
     {
         return $this->active;
@@ -187,7 +188,7 @@ class InstagramAccount extends InstagramSimpleAccount
      * Set the value of active
      *
      * @return  self
-     */ 
+     */
     public function setActive($active)
     {
         $this->active = $active;
