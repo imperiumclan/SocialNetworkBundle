@@ -17,7 +17,7 @@
                                 <img class="card-img-top" src="{{ asset(account.profilePic.assetPath) }}"/>
                                 <div class="card-body">
                                     <h4><a href="{{  path('ics_social_instagram_account',{ id : account.username}) }}">{{ account }}</a></h4>
-                                    <div class="text-muted">{{ account.lastUpdate|date('d/mY H:i') }}</div>
+                                    <div class="text-muted">{{ account.lastUpdate|date('d/m/Y H:i') }}</div>
                                     <div class="text-muted">{{ account.username }}</div>
                                     <div>{{ account.publications|length }} publications</div>
                                 </div>

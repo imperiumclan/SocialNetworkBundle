@@ -9,8 +9,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramSimpleAccount;
 use ICS\MediaBundle\Service\MediaClient;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramSideCar;
-use ICS\SocialNetworkBundle\Entity\Instgram\InstagramVideo;
 use Doctrine\ORM\EntityManagerInterface;
+use ICS\SocialNetworkBundle\Entity\Instagram\InstagramVideo;
 
 class InstagramClient extends AbstractSocialClient
 {
@@ -220,24 +220,33 @@ class InstagramClient extends AbstractSocialClient
         {
             if(is_a($publication,InstagramVideo::class))
             {
-                $publication->setVideo($this->mediaClient->DownloadVideo($publication->getVideoUrl(),$videoBasePath.'/'.$publication->getId().'.mp4'));
+                $url=$publication->getVideoUrl();
+                if($url!="https://static.cdninstagram.com/rsrc.php/null.mp4")
+                {
+                    $publication->setVideo($this->mediaClient->DownloadVideo($url,$videoBasePath.'/'.$publication->getId().'.mp4'));
+                }
             }
             else if(is_a($publication,InstagramSideCar::class))
             {
                 $i=1;
                 foreach($publication->getimagesUrls() as $imgUrl)
                 {
-                    $path=$sidecarBasePath.'/'.$publication->getId();
-                    if(!file_exists($path))
+                    if($imgUrl!="https://static.cdninstagram.com/rsrc.php/null.jpg")
                     {
-                        mkdir($path,0777,true);
+                        $path=$sidecarBasePath.'/'.$publication->getId();
+                        if(!file_exists($path))
+                        {
+                            mkdir($path,0777,true);
+                        }
+                        $publication->getImages()->add($this->mediaClient->DownloadImage($imgUrl,$path.'/'.$i.'.jpg'));
+                        $i++;
                     }
-                    $publication->getImages()->add($this->mediaClient->DownloadImage($imgUrl,$path.'/'.$i.'.jpg'));
-                    $i++;
                 }
             }
-
-            $publication->setImage($this->mediaClient->DownloadImage($publication->getPreviewUrl(),$imageBasePath.'/'.$publication->getId().'.jpg'));
+            if($publication->getPreviewUrl()!="https://static.cdninstagram.com/rsrc.php/null.jpg")
+            {
+                $publication->setImage($this->mediaClient->DownloadImage($publication->getPreviewUrl(),$imageBasePath.'/'.$publication->getId().'.jpg'));
+            }
         }
 
        $this->doctrine->persist($account);

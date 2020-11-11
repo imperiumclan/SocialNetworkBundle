@@ -14,7 +14,8 @@
         "symfony/framework-bundle": "5.1.*",
         "symfony/console": "5.1.*",
         "imperiumclan/navigation-bundle" : "1.0.*",
-        "imperiumclan/media-bundle" : "1.0.*"
+        "imperiumclan/media-bundle" : "1.0.*",
+        "symfony/doctrine-bridge": "5.1.*"
     },
     "scripts": {
         "auto-scripts": {

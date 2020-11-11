@@ -7,6 +7,7 @@ use Exception;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramAccount;
 use ICS\SocialNetworkBundle\Service\InstagramClient;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\Input;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -50,34 +51,49 @@ class DownloadAllCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
 
-
-        $account=$this->doctrine->getRepository(InstagramAccount::class)->findOneBy([
-            'username'=> $input->getArgument('account')
-        ]);
-
-        $io->title('Download all publications for account '.$account->getUsername().' from Instagram');
-        try
+        foreach($this->getAccountList($io,$input) as $account)
         {
-            $io->text('Get URLs of all publications (This may take a long time)');
-            $this->client->getFullPublications($account);
-            $io->success("Account ".$account->getUsername()." contains ".count($account->getPublications())." publications.");
-            $io->text('Download all publications (This may take a long time)');
-            $this->client->updateAccount($account);
-            $io->text('Save data');
-            $this->doctrine->persist($account);
-            $this->doctrine->flush();
-            $io->success("Account ".$account->getUsername()." was up to date with ".count($account->getPublications())." publications.");
-        }
-        catch(Exception $ex)
-        {
+            $io->title('Download all publications for account '.$account->getUsername().' from Instagram');
+            try
+            {
+                $io->text('Get URLs of all publications (This may take a long time)');
+                $this->client->getFullPublications($account);
+                $io->success("Account ".$account->getUsername()." contains ".count($account->getPublications())." publications.");
+                $io->text('Download all publications (This may take a long time)');
+                $this->client->updateAccount($account);
+                $io->text('Save data');
+                $this->doctrine->persist($account);
+                $this->doctrine->flush();
+                $io->success("Account ".$account->getUsername()." was up to date with ".count($account->getPublications())." publications.");
+            }
+            catch(Exception $ex)
+            {
 
-            $io->error($ex->getMessage());
-                return Command::FAILURE;
+                $io->error($ex->getMessage());
+                    return Command::FAILURE;
+            }
         }
-
         return Command::SUCCESS;
     }
 
+    protected function getAccountList(SymfonyStyle $io,InputInterface $input)
+    {
+        if ($input->getArgument('account') == null)
+        {
+            $accounts=$this->doctrine->getRepository(InstagramAccount::class)->findBy(array(
+                'lastUpdate' => null,
+                'active' => true
+            ));
+        }
+        else
+        {
+            $accounts=$this->doctrine->getRepository(InstagramAccount::class)->findBy(array(
+                'username' => $input->getArgument('account')
+            ));
+        }
 
+        return $accounts;
+
+    }
 
 }

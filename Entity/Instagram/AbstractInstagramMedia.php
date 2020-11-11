@@ -11,7 +11,7 @@ use Symfony\Component\Mime\Encoder\Base64Encoder;
 /**
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
- * @ORM\Table()
+ * @ORM\Table(schema="socialnetwork")
  * @ORM\MappedSuperclass
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="discr", type="string")
