@@ -16,7 +16,7 @@ services:
     resource: "../../Twig"
     public: false
     tags: ['twig.extension']
-  ICS\SocialNetworkBundle\Form\:
-    resource: "../../Form"
-    public: false
-    tags: ['controller.service_arguments']
+  # ICS\SocialNetworkBundle\Form\:
+  #   resource: "../../Form"
+  #   public: false
+  #   tags: ['controller.service_arguments']
