@@ -79,6 +79,7 @@ class DownloadAllCommand extends Command
         if(count($error) > 0)
         {
             $io->error(count($error));
+
             foreach($error as $err)
             {
                 $io->error($err->getMessage());
@@ -86,7 +87,6 @@ class DownloadAllCommand extends Command
 
             return Command::FAILURE;
         }
-    $io->error(count($error));
         return Command::SUCCESS;
     }
 

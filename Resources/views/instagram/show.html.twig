@@ -27,9 +27,11 @@
                         {% else %}
                             <a class="btn btn-primary" href="#" title="Last update {{ result.LastUpdate|date('d/m/Y H:i')|default('never') }}"><i class="fa fa-sync"></i> Update</a>
                         {% endif %}
-                        
-                        
                         <a class="btn btn-secondary" href="https://www.instagram.com/{{ result.username }}"><i class="fab fa-instagram"></i> View on Instagram</a>
+
+                        {% if result.facebookPage != "" %}
+                            <a class="btn btn-primary" href="https://www.facebook.com/{{ result.facebookPage }}"><i class="fab fa-facebook"></i> Facebook</a>
+                        {% endif %}
                     </div>
                     
                     
