@@ -216,7 +216,7 @@ class InstagramClient extends AbstractSocialClient
 
 
         // Save publications data
-        foreach($account->getPublications() as $publication)
+        foreach($account->getPublications() as $key=>$publication)
         {
             if(is_a($publication,InstagramVideo::class))
             {
@@ -227,7 +227,7 @@ class InstagramClient extends AbstractSocialClient
                 }
                 else
                 {
-                    $account->getPublications()->remove($publication);
+                    $account->getPublications()->remove($key);
                 }
             }
             else if(is_a($publication,InstagramSideCar::class))
@@ -247,7 +247,7 @@ class InstagramClient extends AbstractSocialClient
                     }
                     else
                     {
-                        $account->getPublications()->remove($publication);
+                        $account->getPublications()->remove($key);
                     }
                 }
             }
@@ -257,7 +257,7 @@ class InstagramClient extends AbstractSocialClient
             }
             else
             {
-                $account->getPublications()->remove($publication);
+                $account->getPublications()->remove($key);
             }
         }
 
