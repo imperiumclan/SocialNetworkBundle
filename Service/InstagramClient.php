@@ -221,7 +221,7 @@ class InstagramClient extends AbstractSocialClient
             if(is_a($publication,InstagramVideo::class))
             {
                 $url=$publication->getVideoUrl();
-                if($url!="https://static.cdninstagram.com/rsrc.php/null.mp4")
+                if($url!= null && $url!="" && $url!="https://static.cdninstagram.com/rsrc.php/null.mp4")
                 {
                     $publication->setVideo($this->mediaClient->DownloadVideo($url,$videoBasePath.'/'.$publication->getId().'.mp4'));
                 }
@@ -231,7 +231,7 @@ class InstagramClient extends AbstractSocialClient
                 $i=1;
                 foreach($publication->getimagesUrls() as $imgUrl)
                 {
-                    if($imgUrl!="https://static.cdninstagram.com/rsrc.php/null.jpg")
+                    if($imgUrl!=null && $imgUrl!="" && $imgUrl!="https://static.cdninstagram.com/rsrc.php/null.jpg")
                     {
                         $path=$sidecarBasePath.'/'.$publication->getId();
                         if(!file_exists($path))
@@ -243,7 +243,7 @@ class InstagramClient extends AbstractSocialClient
                     }
                 }
             }
-            if($publication->getPreviewUrl()!="https://static.cdninstagram.com/rsrc.php/null.jpg")
+            if($publication->getPreviewUrl()!=null && $publication->getPreviewUrl()!="" && $publication->getPreviewUrl()!="https://static.cdninstagram.com/rsrc.php/null.jpg")
             {
                 $publication->setImage($this->mediaClient->DownloadImage($publication->getPreviewUrl(),$imageBasePath.'/'.$publication->getId().'.jpg'));
             }

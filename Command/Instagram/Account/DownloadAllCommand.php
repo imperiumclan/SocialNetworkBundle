@@ -54,6 +54,7 @@ class DownloadAllCommand extends Command
         foreach($this->getAccountList($io,$input) as $account)
         {
             $io->title('Download all publications for account '.$account->getUsername().' from Instagram');
+            $error=array();
             try
             {
                 $io->text('Get URLs of all publications (This may take a long time)');
@@ -68,11 +69,20 @@ class DownloadAllCommand extends Command
             }
             catch(Exception $ex)
             {
-
-                $io->error($ex->getMessage());
-                    return Command::FAILURE;
+                $error[]=$ex;
             }
         }
+
+        if(count($error) > 0)
+        {
+            foreach($error as $err)
+            {
+                $io->error($err->getMessage());
+            }
+
+            return Command::FAILURE;
+        }
+
         return Command::SUCCESS;
     }
 
