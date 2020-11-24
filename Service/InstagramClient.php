@@ -249,10 +249,6 @@ try
                 {
                     $account->getPublications()->remove($key);
                 }
-                else
-                {
-                    $account->getPublications()->remove($key);
-                }
             }
             else if(is_a($publication,InstagramSideCar::class))
             {
