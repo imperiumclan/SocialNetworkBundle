@@ -11,6 +11,7 @@ use ICS\MediaBundle\Service\MediaClient;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramSideCar;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Exception;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramVideo;
 
 class InstagramClient extends AbstractSocialClient

@@ -50,10 +50,12 @@ class DownloadAllCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
+        $error=array();
 
         foreach($this->getAccountList($io,$input) as $account)
         {
             $io->title('Download all publications for account '.$account->getUsername().' from Instagram');
+            
             try
             {
                 $io->text('Get URLs of all publications (This may take a long time)');
@@ -62,16 +64,28 @@ class DownloadAllCommand extends Command
                 $io->text('Download all publications (This may take a long time)');
                 $this->client->updateAccount($account);
                 $io->text('Save data');
+                $account->setlastUpdate(new DateTime());
                 $this->doctrine->persist($account);
                 $this->doctrine->flush();
                 $io->success("Account ".$account->getUsername()." was up to date with ".count($account->getPublications())." publications.");
             }
             catch(Exception $ex)
             {
-
                 $io->error($ex->getMessage());
-                    return Command::FAILURE;
+                $error[]=$ex;
             }
+        }
+
+        if(count($error) > 0)
+        {
+            $io->error(count($error));
+
+            foreach($error as $err)
+            {
+                $io->error($err->getMessage());
+            }
+
+            return Command::FAILURE;
         }
         return Command::SUCCESS;
     }
