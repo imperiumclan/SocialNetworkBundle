@@ -1,5 +1,7 @@
 {% extends "base.html.twig" %}
 
+{% block title %}{{ result }}{% endblock %}
+
 {% block body %}
 <div class="container-fluid">
     <div class="row">
@@ -8,7 +10,7 @@
                 <img height= "64px" class="rounded-circle mr-3" src="{{ result.profilePicUrl }}"/>
                 <div class="media-body">
                     <h2 class="media-title">
-                        {{ result.fullname }} 
+                        {{ result.fullname }}
                         {% if result.verified %}
                             <small class="badge badge-success"><i class="far fa-thumbs-up"></i></small>
                         {% endif %}
@@ -27,12 +29,12 @@
                         {% else %}
                             <a class="btn btn-primary" href="#" title="Last update {{ result.LastUpdate|date('d/m/Y H:i')|default('never') }}"><i class="fa fa-sync"></i> Update</a>
                         {% endif %}
-                        
-                        
+
+
                         <a class="btn btn-secondary" href="https://www.instagram.com/{{ result.username }}"><i class="fab fa-instagram"></i> View on Instagram</a>
                     </div>
-                    
-                    
+
+
                 </div>
                 <div class="media-right">
                     <span class="badge badge-info">Last update {{ result.LastUpdate|date('d/m/Y H:i')|default('never') }}</span>
@@ -41,7 +43,7 @@
             </div>
         </div>
     </div>
-    {# <div class="row">  
+    {# <div class="row">
         <div class="col-12">
             {{ dump(result) }}
         </div>
@@ -50,7 +52,7 @@
         <div class="col-9">
             <div class="row">
                 <div class="col-12">
-                    <h3>Publications</h3>
+                    <h3>{{ result.publications|length }} Publications</h3>
                 </div>
             </div>
             <div class="row">
@@ -69,7 +71,7 @@
                     <h3>Related Accounts</h3>
                 </div>
                 {% for related in result.relatedProfiles %}
-                        <div class="col-12 col-md-6">    
+                        <div class="col-12 col-md-6">
                             <div class="card">
                                 <img class="card-img-top" src="{{ related.profilePicUrl }}"/>
                                 <div class="card-body">
@@ -80,7 +82,7 @@
                                 </div>
                             </div>
                         </div>
-                    
+
                 {% endfor %}
             </div>
         </div>

@@ -9,7 +9,7 @@
         </div>
          <div class="row">
             <div class="col-12">
-                <h2>Saved Accounts</h2>
+                <h2>{{ accounts|length }} Saved Accounts</h2>
                 {% for acc in accounts|batch(8) %}
                     <div class="card-deck mt-3">
                         {% for account in acc %}

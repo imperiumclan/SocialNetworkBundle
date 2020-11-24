@@ -24,10 +24,11 @@ abstract class AbstractSocialClient
             'headers' => [
                 'Cache-Control' => 'no-cache',
                 'Connection' => 'keep-alive',
-                'Accept-Encoding' => 'gzip'
+                'User-Agent' =>'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0',
+                'content-type'=> 'application/json; charset=utf-8',
             ],
         ];
-        $this->headers=[];
+        //$this->headers=[];
 
         $this->client = new CachingHttpClient($this->client, $store);
         $this->container = $container;

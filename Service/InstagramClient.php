@@ -10,6 +10,7 @@ use ICS\SocialNetworkBundle\Entity\Instagram\InstagramSimpleAccount;
 use ICS\MediaBundle\Service\MediaClient;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramSideCar;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramVideo;
 
 class InstagramClient extends AbstractSocialClient
@@ -44,7 +45,8 @@ class InstagramClient extends AbstractSocialClient
 
             $content = $response->getContent();
             $content=json_decode($content);
-
+try
+{
             foreach($content->users as $user)
             {
                 $result=new InstagramSimpleAccount($user->user);
@@ -61,6 +63,11 @@ class InstagramClient extends AbstractSocialClient
                 }
 
             }
+        }
+        catch(Exception $ex){
+            echo $url."\n";
+            dump($response->getContent());
+        }
 
         }
 
@@ -70,7 +77,7 @@ class InstagramClient extends AbstractSocialClient
     public function getAccount(string $username)
     {
         $finalSearchAccount=null;
-
+        $result=null;
         $username=trim(strtolower($username));
 
         foreach($this->search($username) as $account)
@@ -91,9 +98,21 @@ class InstagramClient extends AbstractSocialClient
 
                 $instagramResponse = json_decode($response->getContent());
 
-                $result=new InstagramAccount($instagramResponse->graphql->user);
+                try{
+                    $result=new InstagramAccount($instagramResponse->graphql->user);
+                    $result=$this->updateAccountPublications($result,12);
+                }
+                catch(Exception $ex)
+                {
+                    echo "\n";
+                    echo $ex->getMessage();
+                    dump($url);
+                    dump($instagramResponse);
+                    dump($response);
+                }
 
-                $result=$this->updateAccountPublications($result,12);
+
+
             }
         }
 
@@ -216,14 +235,19 @@ class InstagramClient extends AbstractSocialClient
 
 
         // Save publications data
-        foreach($account->getPublications() as $publication)
+        foreach($account->getPublications() as $key=>$publication)
         {
             if(is_a($publication,InstagramVideo::class))
             {
                 $url=$publication->getVideoUrl();
-                if($url!="https://static.cdninstagram.com/rsrc.php/null.mp4")
+                if($url!="https://static.cdninstagram.com/rsrc.php/null.mp4" && $url !=null)
                 {
                     $publication->setVideo($this->mediaClient->DownloadVideo($url,$videoBasePath.'/'.$publication->getId().'.mp4'));
+
+                }
+                else
+                {
+                    $account->getPublications()->remove($key);
                 }
             }
             else if(is_a($publication,InstagramSideCar::class))
@@ -231,7 +255,7 @@ class InstagramClient extends AbstractSocialClient
                 $i=1;
                 foreach($publication->getimagesUrls() as $imgUrl)
                 {
-                    if($imgUrl!="https://static.cdninstagram.com/rsrc.php/null.jpg")
+                    if($imgUrl!="https://static.cdninstagram.com/rsrc.php/null.jpg" && $imgUrl!=null)
                     {
                         $path=$sidecarBasePath.'/'.$publication->getId();
                         if(!file_exists($path))

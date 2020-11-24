@@ -22,5 +22,8 @@
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         }
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "^5.1"
     }
 }
