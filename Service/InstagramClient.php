@@ -11,7 +11,6 @@ use ICS\MediaBundle\Service\MediaClient;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramSideCar;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Exception;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramVideo;
 
 class InstagramClient extends AbstractSocialClient
@@ -250,6 +249,10 @@ try
                 {
                     $account->getPublications()->remove($key);
                 }
+                else
+                {
+                    $account->getPublications()->remove($key);
+                }
             }
             else if(is_a($publication,InstagramSideCar::class))
             {
@@ -266,11 +269,19 @@ try
                         $publication->getImages()->add($this->mediaClient->DownloadImage($imgUrl,$path.'/'.$i.'.jpg'));
                         $i++;
                     }
+                    else
+                    {
+                        $account->getPublications()->remove($key);
+                    }
                 }
             }
-            if($publication->getPreviewUrl()!="https://static.cdninstagram.com/rsrc.php/null.jpg")
+            if($publication->getPreviewUrl()!=null && $publication->getPreviewUrl()!="" && $publication->getPreviewUrl()!="https://static.cdninstagram.com/rsrc.php/null.jpg")
             {
                 $publication->setImage($this->mediaClient->DownloadImage($publication->getPreviewUrl(),$imageBasePath.'/'.$publication->getId().'.jpg'));
+            }
+            else
+            {
+                $account->getPublications()->remove($key);
             }
         }
 

@@ -33,6 +33,9 @@
 
                         <a class="btn btn-secondary" href="https://www.instagram.com/{{ result.username }}"><i class="fab fa-instagram"></i> View on Instagram</a>
 
+                        {% if result.facebookPage != "" %}
+                            <a class="btn btn-primary" href="https://www.facebook.com/{{ result.facebookPage }}"><i class="fab fa-facebook"></i> Facebook</a>
+                        {% endif %}
                     </div>
 
 
