@@ -20,11 +20,22 @@ class InstagramClient extends AbstractSocialClient
      * @var string
      */
     private $apiEndPoint = 'https://www.instagram.com/graphql/query/';
-
+    /**
+     * Client for Media Download.
+     *
+     * @var ICS\MediaBundle\Service\MediaClient
+     */
     private $mediaClient;
-
+    /**
+     * Orm.
+     *
+     * @var Doctrine\ORM\EntityManagerInterface
+     */
     private $doctrine;
 
+    /**
+     * Class Constructor.
+     */
     public function __construct(ContainerInterface $container, MediaClient $client, EntityManagerInterface $doctrine)
     {
         parent::__construct($container, 'Instagram');
@@ -32,28 +43,26 @@ class InstagramClient extends AbstractSocialClient
         $this->doctrine = $doctrine;
     }
 
+    /**
+     * Search account on instagram.
+     */
     public function search(string $search, $verifiedOnly = false)
     {
-        $url = 'https://www.instagram.com/web/search/topsearch/?query='.$search;
-        $response = $this->client->request('GET', $url, $this->headers);
+        $response = $this->getApiUrl('https://www.instagram.com/web/search/topsearch/?query='.$search);
 
         $results = [];
 
-        if (200 == $response->getStatusCode()) {
-            $content = $response->getContent();
-            $content = json_decode($content);
-            try {
-                foreach ($content->users as $user) {
-                    $result = new InstagramSimpleAccount($user->user);
-                    if ($verifiedOnly) {
-                        if ($result->isVerified()) {
-                            $results[] = $result;
-                        }
-                    } else {
+        if (false != $response) {
+            $content = $response;
+            foreach ($content->users as $user) {
+                $result = new InstagramSimpleAccount($user->user);
+                if ($verifiedOnly) {
+                    if ($result->isVerified()) {
                         $results[] = $result;
                     }
+                } else {
+                    $results[] = $result;
                 }
-            } catch (Exception $ex) {
             }
         }
 
@@ -275,6 +284,25 @@ class InstagramClient extends AbstractSocialClient
 
     public function getAccountInfos($username)
     {
+        $finalSearchAccount = null;
+        $result = null;
+        $username = trim(strtolower($username));
+
+        foreach ($this->search($username) as $account) {
+            if ($account->getUsername() == $username) {
+                $finalSearchAccount = $account;
+            }
+        }
+
+        if (null != $finalSearchAccount) {
+            $response = $this->getApiUrl($finalSearchAccount->getApiUrl());
+            if (false != $response) {
+                $result = new InstagramAccount($response->graphql->user);
+                $result = $this->updateAccountPublications($result, 12);
+            }
+        }
+
+        return $result;
     }
 
     public function getPublicationList(InstagramSimpleAccount $account)

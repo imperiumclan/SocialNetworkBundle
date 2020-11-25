@@ -60,7 +60,7 @@
                 </div>
             </div>
             <div class="row">
-                {% for publications in result.publications|batch(4) %}
+                {% for publications in result.publications|batch(3) %}
                         <div class="card-deck mt-3">
                             {% for publication in publications %}
                                 {{ publication|instagramMedia }}

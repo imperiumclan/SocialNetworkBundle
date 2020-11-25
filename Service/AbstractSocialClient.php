@@ -48,7 +48,7 @@ abstract class AbstractSocialClient
             return json_decode($response->getContent());
         }
 
-        return false;
+        return;
     }
 
     abstract public function search(string $seacrh, $verifiedOnly = false);
