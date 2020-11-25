@@ -2,9 +2,9 @@
 
 namespace ICS\SocialNetworkBundle\Entity\Instagram;
 
-use ICS\SocialNetworkBundle\Service\InstagramClient;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use ICS\SocialNetworkBundle\Service\InstagramClient;
 
 /**
  * @ORM\Entity()
@@ -15,11 +15,11 @@ class InstagramAccount extends InstagramSimpleAccount
     /**
      * @ORM\ManyToOne(targetEntity="ICS\MediaBundle\Entity\MediaImage",cascade={"persist","remove"})
      */
-    private $profilePic=null;
+    private $profilePic = null;
     /**
      * @ORM\Column(type="string",nullable=true)
      */
-    private $facebookPage=null;
+    private $facebookPage = null;
     /**
      * @ORM\Column(type="text",nullable=true)
      */
@@ -48,8 +48,7 @@ class InstagramAccount extends InstagramSimpleAccount
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    private $active=true;
-
+    private $active = true;
 
     public function __construct($jsonResult)
     {
@@ -70,16 +69,14 @@ class InstagramAccount extends InstagramSimpleAccount
         $this->profilePicUrl = $jsonResult->profile_pic_url_hd;
 
         // Related profiles management
-        $related=$jsonResult->edge_related_profiles->edges;
-        foreach($related as $relatedUser)
-        {
+        $related = $jsonResult->edge_related_profiles->edges;
+        foreach ($related as $relatedUser) {
             $this->relatedProfiles->add(new InstagramSimpleAccount($relatedUser->node));
         }
-
     }
 
     /**
-     * Get the value of biography
+     * Get the value of biography.
      */
     public function getBiography()
     {
@@ -87,7 +84,7 @@ class InstagramAccount extends InstagramSimpleAccount
     }
 
     /**
-     * Get the value of externalUrl
+     * Get the value of externalUrl.
      */
     public function getExternalUrl()
     {
@@ -95,7 +92,7 @@ class InstagramAccount extends InstagramSimpleAccount
     }
 
     /**
-     * Get the value of FollowerCount
+     * Get the value of FollowerCount.
      */
     public function getFollowerCount()
     {
@@ -103,7 +100,7 @@ class InstagramAccount extends InstagramSimpleAccount
     }
 
     /**
-     * Get the value of facebookPage
+     * Get the value of facebookPage.
      */
     public function getFacebookPage()
     {
@@ -111,7 +108,7 @@ class InstagramAccount extends InstagramSimpleAccount
     }
 
     /**
-     * Get the value of publications
+     * Get the value of publications.
      */
     public function getPublications()
     {
@@ -119,7 +116,7 @@ class InstagramAccount extends InstagramSimpleAccount
     }
 
     /**
-     * Get the value of profilePic
+     * Get the value of profilePic.
      */
     public function getProfilePic()
     {
@@ -127,9 +124,9 @@ class InstagramAccount extends InstagramSimpleAccount
     }
 
     /**
-     * Set the value of profilePic
+     * Set the value of profilePic.
      *
-     * @return  self
+     * @return self
      */
     public function setProfilePic($profilePic)
     {
@@ -139,25 +136,15 @@ class InstagramAccount extends InstagramSimpleAccount
     }
 
     /**
-     * Get the value of relatedProfiles
+     * Get the value of relatedProfiles.
      */
     public function getRelatedProfiles()
     {
         return $this->relatedProfiles;
     }
 
-    public function __toString()
-    {
-        if($this->getFullname()!="")
-        {
-            return $this->getFullname();
-        }
-
-        return $this->getUsername();
-    }
-
     /**
-     * Get the value of lastUpdate
+     * Get the value of lastUpdate.
      */
     public function getLastUpdate()
     {
@@ -165,9 +152,9 @@ class InstagramAccount extends InstagramSimpleAccount
     }
 
     /**
-     * Set the value of lastUpdate
+     * Set the value of lastUpdate.
      *
-     * @return  self
+     * @return self
      */
     public function setLastUpdate($lastUpdate)
     {
@@ -177,7 +164,7 @@ class InstagramAccount extends InstagramSimpleAccount
     }
 
     /**
-     * Get the value of active
+     * Get the value of active.
      */
     public function getActive()
     {
@@ -185,9 +172,9 @@ class InstagramAccount extends InstagramSimpleAccount
     }
 
     /**
-     * Set the value of active
+     * Set the value of active.
      *
-     * @return  self
+     * @return self
      */
     public function setActive($active)
     {

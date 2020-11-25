@@ -15,7 +15,12 @@
         "symfony/console": "5.1.*",
         "imperiumclan/navigation-bundle" : "1.0.*",
         "imperiumclan/media-bundle" : "1.0.*",
-        "symfony/doctrine-bridge": "5.1.*"
+        "symfony/doctrine-bridge": "5.1.*",
+        "composer/package-versions-deprecated": "1.11.99.1",
+        "doctrine/doctrine-bundle": "^2.2",
+        "doctrine/doctrine-migrations-bundle": "^3.0",
+        "doctrine/orm": "^2.7",
+        "symfony/http-client": "5.1.*"
     },
     "scripts": {
         "auto-scripts": {

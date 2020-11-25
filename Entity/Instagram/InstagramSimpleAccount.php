@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\MappedSuperclass
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="discr", type="string")
-*/
+ */
 class InstagramSimpleAccount
 {
     /**
@@ -42,23 +42,20 @@ class InstagramSimpleAccount
 
     public function __construct($jsonResult)
     {
-        if(property_exists($jsonResult,'id'))
-        {
-            $this->id=$jsonResult->id;
+        if (property_exists($jsonResult, 'id')) {
+            $this->id = $jsonResult->id;
+        } else {
+            $this->id = $jsonResult->pk;
         }
-        else
-        {
-            $this->id=$jsonResult->pk;
-        }
-        $this->username=$jsonResult->username;
-        $this->fullname=$jsonResult->full_name;
-        $this->profilePicUrl=$jsonResult->profile_pic_url;
-        $this->private=$jsonResult->is_private=='true';
-        $this->verified=$jsonResult->is_verified=='true';
+        $this->username = $jsonResult->username;
+        $this->fullname = $jsonResult->full_name;
+        $this->profilePicUrl = $jsonResult->profile_pic_url;
+        $this->private = 'true' == $jsonResult->is_private;
+        $this->verified = 'true' == $jsonResult->is_verified;
     }
 
     /**
-     * Get the value of id
+     * Get the value of id.
      */
     public function getId()
     {
@@ -66,7 +63,7 @@ class InstagramSimpleAccount
     }
 
     /**
-     * Get the value of username
+     * Get the value of username.
      */
     public function getUsername()
     {
@@ -74,7 +71,7 @@ class InstagramSimpleAccount
     }
 
     /**
-     * Get the value of fullname
+     * Get the value of fullname.
      */
     public function getFullname()
     {
@@ -82,7 +79,7 @@ class InstagramSimpleAccount
     }
 
     /**
-     * Get the value of profilePicUrl
+     * Get the value of profilePicUrl.
      */
     public function getProfilePicUrl()
     {
@@ -90,7 +87,7 @@ class InstagramSimpleAccount
     }
 
     /**
-     * Get the value of isPrivate
+     * Get the value of isPrivate.
      */
     public function isPrivate()
     {
@@ -98,7 +95,7 @@ class InstagramSimpleAccount
     }
 
     /**
-     * Get the value of isVefified
+     * Get the value of isVefified.
      */
     public function isVerified()
     {
@@ -112,6 +109,15 @@ class InstagramSimpleAccount
 
     public function getApiUrl()
     {
-        return 'https://www.instagram.com/'.$this->getUsername()."?__a=1";
+        return 'https://www.instagram.com/'.$this->getUsername().'?__a=1';
+    }
+
+    public function __toString()
+    {
+        if ('' != $this->getFullname()) {
+            return $this->getFullname();
+        }
+
+        return $this->getUsername();
     }
 }
