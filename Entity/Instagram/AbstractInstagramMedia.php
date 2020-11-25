@@ -157,7 +157,7 @@ abstract class AbstractInstagramMedia {
      */
     public function getText()
     {
-        return $this->text;
+        return utf8_decode($this->text);
     }
 
     /**

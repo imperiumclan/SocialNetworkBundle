@@ -45,29 +45,28 @@ class InstagramClient extends AbstractSocialClient
 
             $content = $response->getContent();
             $content=json_decode($content);
-try
-{
-            foreach($content->users as $user)
+            try
             {
-                $result=new InstagramSimpleAccount($user->user);
-                if($verifiedOnly)
+                foreach($content->users as $user)
                 {
-                    if($result->isVerified())
+                    $result=new InstagramSimpleAccount($user->user);
+                    if($verifiedOnly)
+                    {
+                        if($result->isVerified())
+                        {
+                            $results[]=$result;
+                        }
+                    }
+                    else
                     {
                         $results[]=$result;
                     }
-                }
-                else
-                {
-                    $results[]=$result;
-                }
 
+                }
             }
-        }
-        catch(Exception $ex){
-            echo $url."\n";
-            dump($response->getContent());
-        }
+            catch(Exception $ex){
+                
+            }
 
         }
 
@@ -106,9 +105,6 @@ try
                 {
                     echo "\n";
                     echo $ex->getMessage();
-                    dump($url);
-                    dump($instagramResponse);
-                    dump($response);
                 }
 
 
@@ -198,24 +194,26 @@ try
         return false;
     }
 
-    static public function TransformToLink(string $text)
+    static public function TransformToLink(string $text=null)
     {
-        // Gestion des #tag
-        preg_match_all("/(\s#\w+)/u", $text, $matches);
-        foreach($matches[0] as $tag)
+        if($text!=null)
         {
-            $text=str_replace($tag,'<a href="https://www.instagram.com/explore/tags/'.substr($tag,1).'" target="_blank">'.$tag.'</a>',$text);
+            // Gestion des #tag
+            preg_match_all("/(\s#\w+)/u", $text, $matches);
+            foreach($matches[0] as $tag)
+            {
+                $text=str_replace($tag,'<a href="https://www.instagram.com/explore/tags/'.trim(substr($tag,1),"#").'" target="_blank">'.$tag.'</a>',$text);
+            }
+
+            // Gestion des @person
+            preg_match_all("/(\s@\w+)/u", $text, $matches);
+            foreach($matches[0] as $person)
+            {
+                $text=str_replace($person,'<a href="https://www.instagram.com/'.trim(substr($person,1),"@").'" target="_blank">'.$person.'</a>',$text);
+            }
+
+            $text=str_replace("\n","<br/>",$text);
         }
-
-        // Gestion des @person
-        preg_match_all("/(\s@\w+)/u", $text, $matches);
-        foreach($matches[0] as $person)
-        {
-            $text=str_replace($person,'<a href="https://www.instagram.com/'.substr($person,1).'" target="_blank">'.$person.'</a>',$text);
-        }
-
-        $text=str_replace("\n","<br/>",$text);
-
         return $text;
     }
 
