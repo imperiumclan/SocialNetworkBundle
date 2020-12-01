@@ -6,4 +6,7 @@
         <div class="text-muted"><i class="fa fa-clock"></i> Taken date : {{ media.takenDate|date('d/m/Y H:i') }}</div>
         {{ media.text|raw }}
     </div>
+    <div class="card-footer">
+    <a target="_blank" href="https://www.instagram.com/p/{{ media.shortCode }}/?__a=1">{{ media.shortCode }}</a>
+    </div>
 </div>

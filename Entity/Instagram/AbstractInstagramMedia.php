@@ -16,9 +16,9 @@ use ICS\SocialNetworkBundle\Service\InstagramClient;
  */
 abstract class AbstractInstagramMedia
 {
-    protected const INSTAGRAM_MEDIA_IMAGE = 'GraphImage';
-    protected const INSTAGRAM_MEDIA_VIDEO = 'GraphVideo';
-    protected const INSTAGRAM_MEDIA_SIDECAR = 'GraphSidecar';
+    public const INSTAGRAM_MEDIA_IMAGE = 'GraphImage';
+    public const INSTAGRAM_MEDIA_VIDEO = 'GraphVideo';
+    public const INSTAGRAM_MEDIA_SIDECAR = 'GraphSidecar';
 
     /**
      * @ORM\Column(type="bigint")

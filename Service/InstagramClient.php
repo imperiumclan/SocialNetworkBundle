@@ -3,10 +3,10 @@
 namespace ICS\SocialNetworkBundle\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use ICS\MediaBundle\Service\MediaClient;
 use ICS\SocialNetworkBundle\Entity\Instagram\AbstractInstagramMedia;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramAccount;
+use ICS\SocialNetworkBundle\Entity\Instagram\InstagramImage;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramSideCar;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramSimpleAccount;
 use ICS\SocialNetworkBundle\Entity\Instagram\InstagramVideo;
@@ -14,12 +14,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class InstagramClient extends AbstractSocialClient
 {
-    /**
-     * Instagram Api EndPoint.
-     *
-     * @var string
-     */
-    private $apiEndPoint = 'https://www.instagram.com/graphql/query/';
     /**
      * Client for Media Download.
      *
@@ -71,86 +65,31 @@ class InstagramClient extends AbstractSocialClient
 
     public function getAccount(string $username)
     {
-        $finalSearchAccount = null;
-        $result = null;
-        $username = trim(strtolower($username));
+        $account = $this->getAccountInfos($username);
 
-        foreach ($this->search($username) as $account) {
-            if ($account->getUsername() == $username) {
-                $finalSearchAccount = $account;
-            }
-        }
-
-        if (null != $finalSearchAccount) {
-            $url = $finalSearchAccount->getApiUrl();
-            $response = $this->client->request('GET', $url, $this->headers);
-
-            if (200 == $response->getStatusCode()) {
-                $instagramResponse = json_decode($response->getContent());
-
-                try {
-                    $result = new InstagramAccount($instagramResponse->graphql->user);
-                    $result = $this->updateAccountPublications($result, 12);
-                } catch (Exception $ex) {
-                    dump($ex->getMessage());
-                }
-            }
-        }
-
-        return $result;
+        return $account;
     }
 
     public function updateAccountPublications(InstagramAccount $account, int $nbpublications = 50)
     {
-        $options = [
-            'variables' => '{"id":"'.$account->getId().'","first":"'.$nbpublications.'"}',
-        ];
-        $url = $this->prepareRequest($options);
+        $publications = $this->getPublicationList($account, 0);
 
-        $response = $this->client->request('GET', $url, $this->headers);
-
-        if (200 == $response->getStatusCode()) {
-            $accountPublications = json_decode($response->getContent());
-
-            foreach ($accountPublications->data->user->edge_owner_to_timeline_media->edges as $medias) {
-                $media = AbstractInstagramMedia::getMedia($medias->node, $this);
-                if (null != $media && !$this->publicationExist($account, $media)) {
-                    $account->getPublications()->add($media);
-                }
+        foreach ($publications as $publication) {
+            if (!$this->publicationExist($account, $publication)) {
+                $account->getPublications()->add($publication);
             }
         }
 
         return $account;
     }
 
-    public function getFullPublications(InstagramAccount $account, int $nbpublications = 50, string $endpointer = null)
+    public function getFullPublications(InstagramAccount $account)
     {
-        $variables = '{"id":"'.$account->getId().'","first":"'.$nbpublications.'"';
+        $publications = $this->getPublicationList($account, 0);
 
-        if (null != $endpointer) {
-            $variables .= ',"after":"'.$endpointer.'"';
-        }
-
-        $variables .= '}';
-        $options = [
-            'variables' => $variables,
-        ];
-        $url = $this->prepareRequest($options);
-
-        $response = $this->client->request('GET', $url, $this->headers);
-
-        if (200 == $response->getStatusCode()) {
-            $accountPublications = json_decode($response->getContent());
-
-            foreach ($accountPublications->data->user->edge_owner_to_timeline_media->edges as $medias) {
-                $media = AbstractInstagramMedia::getMedia($medias->node, $this);
-                if (!$this->publicationExist($account, $media)) {
-                    $account->getPublications()->add($media);
-                }
-            }
-
-            if ($accountPublications->data->user->edge_owner_to_timeline_media->page_info->has_next_page) {
-                $this->getFullPublications($account, $nbpublications, $accountPublications->data->user->edge_owner_to_timeline_media->page_info->end_cursor);
+        foreach ($publications as $publication) {
+            if (!$this->publicationExist($account, $publication)) {
+                $account->getPublications()->add($publication);
             }
         }
 
@@ -168,43 +107,16 @@ class InstagramClient extends AbstractSocialClient
         return false;
     }
 
-    public static function TransformToLink(string $text = null)
+    public function saveAccount(InstagramSimpleAccount $account)
     {
-        if (null != $text) {
-            $test = 'tioietpozitepo';
-
-            if (true) {
-                $test = 'toto';
-            }
-
-            // Gestion des #tag
-            preg_match_all("/(\s#\w+)/u", $text, $matches);
-            foreach ($matches[0] as $tag) {
-                $text = str_replace($tag, '<a href="https://www.instagram.com/explore/tags/'.trim(substr($tag, 1), '#').'" target="_blank">'.$tag.'</a>', $text);
-            }
-
-            // Gestion des @person
-            preg_match_all("/(\s@\w+)/u", $text, $matches);
-            foreach ($matches[0] as $person) {
-                $text = str_replace($person, '<a href="https://www.instagram.com/'.trim(substr($person, 1), '@').'" target="_blank">'.$person.'</a>', $text);
-            }
-
-            $text = str_replace("\n", '<br/>', $text);
-        }
-
-        return $text;
-    }
-
-    public function updateAccount(InstagramAccount $account)
-    {
-        $basepath = $this->mediaClient->getBasePath();
-
-        $this->createAccountPath($account);
-
-        $accountBasePath = $basepath.'/socialNetwork/Instagram/'.$account->getUsername().'/';
-        $imageBasePath = $basepath.'/socialNetwork/Instagram/'.$account->getUsername().'/images';
-        $sidecarBasePath = $basepath.'/socialNetwork/Instagram/'.$account->getUsername().'/sidecars';
-        $videoBasePath = $basepath.'/socialNetwork/Instagram/'.$account->getUsername().'/videos';
+        // Get full account infos
+        $account = $this->getAccountInfos($account->getUsername());
+        // Create account path for medias
+        $paths = $this->createAccountPath($account);
+        $accountBasePath = $paths['base'];
+        $imageBasePath = $paths['images'];
+        $sidecarBasePath = $paths['sidecars'];
+        $videoBasePath = $paths['videos'];
 
         // Download Profile Picture
         $account->setProfilePic($this->mediaClient->DownloadImage($account->getProfilePicUrl(), $accountBasePath.'/profile_pic.jpeg'));
@@ -244,42 +156,21 @@ class InstagramClient extends AbstractSocialClient
         $this->doctrine->flush();
     }
 
-    private function createAccountPath(InstagramAccount $account)
+    private function createAccountPath(InstagramSimpleAccount $account)
     {
         $basepath = $this->mediaClient->getBasePath();
-        $path[] = $basepath.'/socialNetwork/Instagram/'.$account->getUsername().'/';
-        $path[] = $basepath.'/socialNetwork/Instagram/'.$account->getUsername().'/images';
-        $path[] = $basepath.'/socialNetwork/Instagram/'.$account->getUsername().'/sidecars';
-        $path[] = $basepath.'/socialNetwork/Instagram/'.$account->getUsername().'/videos';
+        $path['base'] = $basepath.'/socialNetwork/Instagram/'.$account->getUsername().'/';
+        $path['images'] = $basepath.'/socialNetwork/Instagram/'.$account->getUsername().'/images';
+        $path['sidecars'] = $basepath.'/socialNetwork/Instagram/'.$account->getUsername().'/sidecars';
+        $path['videos'] = $basepath.'/socialNetwork/Instagram/'.$account->getUsername().'/videos';
 
         foreach ($path as $p) {
             if (!file_exists($p)) {
                 mkdir($p, 0777, true);
             }
         }
-    }
 
-    private function prepareRequest($requestOptions)
-    {
-        //For All Request
-        $options['query_hash'] = '472f257a40c653c64c666ce877d59d2b';
-
-        $options = array_merge($options, $requestOptions);
-
-        return $this->makeRequest($options);
-    }
-
-    private function makeRequest($requestOptions)
-    {
-        $options = '?';
-
-        foreach ($requestOptions as $key => $opt) {
-            $options .= $key.'='.$opt.'&';
-        }
-
-        $options = substr($options, 0, strlen($options) - 1);
-
-        return $this->apiEndPoint.$options;
+        return $path;
     }
 
     public function getAccountInfos($username)
@@ -298,18 +189,113 @@ class InstagramClient extends AbstractSocialClient
             $response = $this->getApiUrl($finalSearchAccount->getApiUrl());
             if (false != $response) {
                 $result = new InstagramAccount($response->graphql->user);
-                $result = $this->updateAccountPublications($result, 12);
+                $publications = $this->getPublicationList($account);
+
+                dump($publications);
+
+                foreach ($publications as $publication) {
+                    if (null != $publication && !$this->publicationExist($account, $publication)) {
+                        $account->getPublications()->add($publication);
+                    }
+                }
             }
         }
 
         return $result;
     }
 
-    public function getPublicationList(InstagramSimpleAccount $account)
+    public function getPublicationList(InstagramSimpleAccount $account, $nbpublications = 12)
     {
+        return $this->getPublicationsPage($account, $nbpublications);
     }
 
-    public function getPublication($shortcode)
+    public function getPublicationsPage(InstagramSimpleAccount $account, int $nbpublications, string $endpointer = null)
     {
+        $publications = [];
+
+        $variables = '{"id":"'.$account->getId().'","first":"'.$nbpublications.'"';
+
+        if (null != $endpointer) {
+            $variables .= ',"after":"'.$endpointer.'"';
+        }
+
+        $variables .= '}';
+        $options = [
+            'variables' => $variables,
+            'query_hash' => '472f257a40c653c64c666ce877d59d2b',
+        ];
+
+        $response = $this->getApiUrl('https://www.instagram.com/graphql/query/', $options);
+
+        if (false != $response) {
+            foreach ($response->data->user->edge_owner_to_timeline_media->edges as $pub) {
+                $p = $this->getPublication($pub->node->shortcode);
+
+                if (null != $p) {
+                    $publications[] = $p;
+                }
+            }
+
+            if (0 == $nbpublications) {
+                $nextPublications = $this->getPublicationsPage($account, $nbpublications, $response->data->user->edge_owner_to_timeline_media->page_info->end_cursor);
+                $publications = array_merge($publications, $nextPublications);
+            }
+        }
+
+        return $publications;
+    }
+
+    public function getPublication($shortCode): ?AbstractInstagramMedia
+    {
+        $options = [
+            // 'query_hash' => '472f257a40c653c64c666ce877d59d2b',
+            '__a' => '1',
+            'type' => 'json',
+        ];
+
+        $response = $this->getApiUrl('https://www.instagram.com/p/'.$shortCode.'/', $options);
+
+        if (false != $response) {
+            switch ($response->shortcode_media->__typename) {
+                case AbstractInstagramMedia::INSTAGRAM_MEDIA_SIDECAR:
+                    return new InstagramVideo($response->shortcode_media);
+                break;
+                case AbstractInstagramMedia::INSTAGRAM_MEDIA_SIDECAR:
+                    return new InstagramSideCar($response->shortcode_media);
+                break;
+                default:
+                    return new InstagramImage($response->shortcode_media);
+                break;
+            }
+        }
+
+        return null;
+    }
+
+    public static function TransformToLink(string $text = null)
+    {
+        if (null != $text) {
+            $test = 'tioietpozitepo';
+
+            if (true) {
+                $test = 'toto';
+            }
+
+            // Gestion des #tag
+            preg_match_all("/(\s#\w+)/u", $text, $matches);
+            foreach ($matches[0] as $tag) {
+                $text = str_replace($tag, '<a href="https://www.instagram.com/explore/tags/'.trim(substr($tag, 1), '#').'" target="_blank">'.$tag.'</a>', $text);
+            }
+
+            // Gestion des @person
+            preg_match_all("/(\s@\w+)/u", $text, $matches);
+            foreach ($matches[0] as $person) {
+                $text = str_replace($person, '<a href="https://www.instagram.com/'.trim(substr($person, 1), '@').'" target="_blank">'.$person.'</a>', $text);
+            }
+
+            $text = str_replace("\n", '<br/>', $text);
+        }
+
+        return $text;
     }
 }

@@ -4,7 +4,6 @@ namespace ICS\SocialNetworkBundle\Entity\Instagram;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use ICS\SocialNetworkBundle\Service\InstagramClient;
 
 /**
  * @ORM\Entity()
@@ -22,15 +21,14 @@ class InstagramSideCar extends AbstractInstagramMedia
      */
     private $imagesUrls;
 
-    public function __construct($jsonResult = null, InstagramClient $client = null)
+    public function __construct($jsonResult)
     {
         parent::__construct($jsonResult);
         $this->images = new ArrayCollection();
         $this->imagesUrls = new ArrayCollection();
-        $response = $client->getApiUrl($this->getMediaApiUrl());
-        dump($response);
-        if (null != $client && false != $response) {
-            foreach ($response->graphql->shortcode_media->edge_sidecar_to_children->edges as $sidecar) {
+
+        if (null != $jsonResult) {
+            foreach ($jsonResult->edge_sidecar_to_children->edges as $sidecar) {
                 $this->imagesUrls->add($sidecar->node->display_url);
             }
         }

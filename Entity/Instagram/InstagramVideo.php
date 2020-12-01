@@ -2,8 +2,6 @@
 
 namespace ICS\SocialNetworkBundle\Entity\Instagram;
 
-use ICS\SocialNetworkBundle\Service\InstagramClient;
-
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -22,19 +20,17 @@ class InstagramVideo extends AbstractInstagramMedia
      */
     private $video;
 
-    public function __construct($jsonResult=null,InstagramClient $client=null)
+    public function __construct($jsonResult = null)
     {
         parent::__construct($jsonResult);
 
-        if($client!=null && $response=$client->getApiUrl($this->getMediaApiUrl()))
-        {
-            $this->videoUrl=$response->graphql->shortcode_media->video_url;
-            //dump($response);
+        if (null != $jsonResult) {
+            $this->videoUrl = $jsonResult->video_url;
         }
     }
 
     /**
-     * Get the value of videoUrl
+     * Get the value of videoUrl.
      */
     public function getVideoUrl()
     {
@@ -42,7 +38,7 @@ class InstagramVideo extends AbstractInstagramMedia
     }
 
     /**
-     * Get the value of video
+     * Get the value of video.
      */
     public function getVideo()
     {
@@ -50,9 +46,9 @@ class InstagramVideo extends AbstractInstagramMedia
     }
 
     /**
-     * Set the value of video
+     * Set the value of video.
      *
-     * @return  self
+     * @return self
      */
     public function setVideo($video)
     {

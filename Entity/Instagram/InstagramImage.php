@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class InstagramImage extends AbstractInstagramMedia
 {
-    public function __construct($jsonResult=null)
+    public function __construct($jsonResult = null)
     {
         parent::__construct($jsonResult);
     }
