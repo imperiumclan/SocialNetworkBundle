@@ -14,7 +14,9 @@
                     <div class="card-deck mt-3">
                         {% for account in acc %}
                             <div class="card">
-                                <img class="card-img-top" src="{{ asset(account.profilePic.assetPath) }}"/>
+                                {% if account.profilePic %}
+                                    <img class="card-img-top" src="{{ asset(account.profilePic.assetPath) }}"/>
+                                {% endif %}
                                 <div class="card-body">
                                     <h4><a href="{{  path('ics_social_instagram_account',{ id : account.username}) }}">{{ account }}</a></h4>
                                     <div class="text-muted">{{ account.lastUpdate|date('d/m/Y H:i') }}</div>
