@@ -7,8 +7,8 @@
     <div class="row">
         <div class="col-12">
             <div class="media my-3">
-                {% if account.profilePic %}
-                    <img height= "64px" class="rounded-circle mr-3" src="{{ asset(account.profilePic.assetPath) }}"/>
+                {% if result.profilePic %}
+                    <img height= "64px" class="rounded-circle mr-3" src="{{ asset(result.profilePic.assetPath) }}"/>
                 {% endif %}
                 <div class="media-body">
                     <h2 class="media-title">
