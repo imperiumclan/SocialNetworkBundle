@@ -74,7 +74,7 @@ class AtlantisImport  extends Command
                     $account=$this->client->getAccount($old->getUsername());
                     if($account != null)
                     {
-                        $this->client->updateAccount($account);
+                        $this->client->saveAccount($account);
                         $this->doctrine->persist($account);
                         $this->doctrine->flush();
                         $io->success('Account '.$account->getUsername().' imported');

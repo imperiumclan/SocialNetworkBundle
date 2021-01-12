@@ -55,14 +55,14 @@ class DownloadAllCommand extends Command
         foreach($this->getAccountList($io,$input) as $account)
         {
             $io->title('Download all publications for account '.$account->getUsername().' from Instagram');
-            
+
             try
             {
                 $io->text('Get URLs of all publications (This may take a long time)');
                 $this->client->getFullPublications($account);
                 $io->success("Account ".$account->getUsername()." contains ".count($account->getPublications())." publications.");
                 $io->text('Download all publications (This may take a long time)');
-                $this->client->updateAccount($account);
+                $this->client->saveAccount($account);
                 $io->text('Save data');
                 $account->setlastUpdate(new DateTime());
                 $this->doctrine->persist($account);
