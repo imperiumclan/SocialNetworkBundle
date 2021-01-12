@@ -70,7 +70,15 @@ abstract class AbstractInstagramMedia
 
             $this->previewUrl = $jsonResult->display_url;
             $this->likeCount = $jsonResult->edge_media_preview_like->count;
-            $this->commentCount = $jsonResult->edge_media_to_comment->count;
+            if(property_exists($jsonResult,"edge_media_to_comment"))
+            {
+                $this->commentCount = $jsonResult->edge_media_to_comment->count;
+            }
+            else
+            {
+                $this->commentCount = 0;
+            }
+
         }
     }
 

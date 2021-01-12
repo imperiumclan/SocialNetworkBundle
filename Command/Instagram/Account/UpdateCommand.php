@@ -56,7 +56,7 @@ class UpdateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        
+
         $accounts=$this->getAccountList($input,$output);
         $io->title('Update '.count($accounts).' Instagram account');
 
@@ -66,7 +66,7 @@ class UpdateCommand extends Command
             try
             {
                 $this->client->updateAccountPublications($account);
-                $this->client->updateAccount($account);
+                $this->client->saveAccount($account);
                 $account->setLastUpdate(new DateTime());
                 $this->doctrine->persist($account);
                 $this->doctrine->flush();
@@ -80,7 +80,7 @@ class UpdateCommand extends Command
             }
         }
 
-        
+
 
         //;
 

@@ -29,9 +29,9 @@ abstract class AbstractSocialClient
                 'Accept-Encoding' => 'gzip, deflate, br',
                 'Accept-Language' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
                 'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                'TE' => 'TE	Trailers',
-                'Upgrade-Insecure-Requests' => '1',
-                'Host' => 'www.instagram.com',
+                // 'TE' => 'TE	Trailers',
+                // 'Upgrade-Insecure-Requests' => '1',
+                // 'Host' => 'www.instagram.com',
                 // 'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0',
                 'User-Agent' => 'Mozilla/5.0 (Linux; U; Android 4.4.2; en-us; SCH-I535 Build/KOT49H) ',
                 'Referer ' => 'https://www.instagram.com',
@@ -55,13 +55,13 @@ abstract class AbstractSocialClient
         }
 
         $response = $this->client->request('GET', $url.$options, [
-            'max_redirects' => 1,
+            'max_redirects' => 5,
         ]);
         $contentType = $response->getHeaders()['content-type'][0];
         dump($url.$options);
-        dump($response->getContent());
+        // dump($response->getContent());
         $this->cookie = '';
-        dump($response->getHeaders());
+        // dump($response->getHeaders());
         // foreach ($response->getHeaders()['set-cookie'] as $cookieLine) {
         //     $this->cookie = $this->cookie.$cookieLine;
         // }

@@ -96,7 +96,7 @@ class InstagramClient extends AbstractSocialClient
         return $account;
     }
 
-    public function publicationExist(InstagramAccount $account, AbstractInstagramMedia $media)
+    public function publicationExist(InstagramSimpleAccount $account, AbstractInstagramMedia $media)
     {
         foreach ($account->getPublications() as $pub) {
             if ($pub->getId() == $media->getId()) {
@@ -109,51 +109,55 @@ class InstagramClient extends AbstractSocialClient
 
     public function saveAccount(InstagramSimpleAccount $account)
     {
+
         // Get full account infos
         $account = $this->getAccountInfos($account->getUsername());
-        // Create account path for medias
-        $paths = $this->createAccountPath($account);
-        $accountBasePath = $paths['base'];
-        $imageBasePath = $paths['images'];
-        $sidecarBasePath = $paths['sidecars'];
-        $videoBasePath = $paths['videos'];
+        if($account!=null)
+        {
+            // Create account path for medias
+            $paths = $this->createAccountPath($account);
+            $accountBasePath = $paths['base'];
+            $imageBasePath = $paths['images'];
+            $sidecarBasePath = $paths['sidecars'];
+            $videoBasePath = $paths['videos'];
 
-        // Download Profile Picture
-        $account->setProfilePic($this->mediaClient->DownloadImage($account->getProfilePicUrl(), $accountBasePath.'/profile_pic.jpeg'));
+            // Download Profile Picture
+            $account->setProfilePic($this->mediaClient->DownloadImage($account->getProfilePicUrl(), $accountBasePath.'/profile_pic.jpeg'));
 
-        // Save publications data
-        foreach ($account->getPublications() as $key => $publication) {
-            if (is_a($publication, InstagramVideo::class)) {
-                $url = $publication->getVideoUrl();
-                if ('https://static.cdninstagram.com/rsrc.php/null.mp4' != $url && null != $url) {
-                    $publication->setVideo($this->mediaClient->DownloadVideo($url, $videoBasePath.'/'.$publication->getId().'.mp4'));
-                } else {
-                    $account->getPublications()->remove($key);
-                }
-            } elseif (is_a($publication, InstagramSideCar::class)) {
-                $i = 1;
-                foreach ($publication->getimagesUrls() as $imgUrl) {
-                    if ('https://static.cdninstagram.com/rsrc.php/null.jpg' != $imgUrl && null != $imgUrl) {
-                        $path = $sidecarBasePath.'/'.$publication->getId();
-                        if (!file_exists($path)) {
-                            mkdir($path, 0777, true);
-                        }
-                        $publication->getImages()->add($this->mediaClient->DownloadImage($imgUrl, $path.'/'.$i.'.jpg'));
-                        ++$i;
+            // Save publications data
+            foreach ($account->getPublications() as $key => $publication) {
+                if (is_a($publication, InstagramVideo::class)) {
+                    $url = $publication->getVideoUrl();
+                    if ('https://static.cdninstagram.com/rsrc.php/null.mp4' != $url && null != $url) {
+                        $publication->setVideo($this->mediaClient->DownloadVideo($url, $videoBasePath.'/'.$publication->getId().'.mp4'));
                     } else {
                         $account->getPublications()->remove($key);
                     }
+                } elseif (is_a($publication, InstagramSideCar::class)) {
+                    $i = 1;
+                    foreach ($publication->getimagesUrls() as $imgUrl) {
+                        if ('https://static.cdninstagram.com/rsrc.php/null.jpg' != $imgUrl && null != $imgUrl) {
+                            $path = $sidecarBasePath.'/'.$publication->getId();
+                            if (!file_exists($path)) {
+                                mkdir($path, 0777, true);
+                            }
+                            $publication->getImages()->add($this->mediaClient->DownloadImage($imgUrl, $path.'/'.$i.'.jpg'));
+                            ++$i;
+                        } else {
+                            $account->getPublications()->remove($key);
+                        }
+                    }
+                }
+                if (null != $publication->getPreviewUrl() && '' != $publication->getPreviewUrl() && 'https://static.cdninstagram.com/rsrc.php/null.jpg' != $publication->getPreviewUrl()) {
+                    $publication->setImage($this->mediaClient->DownloadImage($publication->getPreviewUrl(), $imageBasePath.'/'.$publication->getId().'.jpg'));
+                } else {
+                    $account->getPublications()->remove($key);
                 }
             }
-            if (null != $publication->getPreviewUrl() && '' != $publication->getPreviewUrl() && 'https://static.cdninstagram.com/rsrc.php/null.jpg' != $publication->getPreviewUrl()) {
-                $publication->setImage($this->mediaClient->DownloadImage($publication->getPreviewUrl(), $imageBasePath.'/'.$publication->getId().'.jpg'));
-            } else {
-                $account->getPublications()->remove($key);
-            }
-        }
 
-        $this->doctrine->persist($account);
-        $this->doctrine->flush();
+            $this->doctrine->persist($account);
+            $this->doctrine->flush();
+        }
     }
 
     private function createAccountPath(InstagramSimpleAccount $account)
@@ -191,8 +195,6 @@ class InstagramClient extends AbstractSocialClient
                 $result = new InstagramAccount($response->graphql->user);
                 $publications = $this->getPublicationList($account);
 
-                dump($publications);
-
                 foreach ($publications as $publication) {
                     if (null != $publication && !$this->publicationExist($account, $publication)) {
                         $account->getPublications()->add($publication);
@@ -204,14 +206,19 @@ class InstagramClient extends AbstractSocialClient
         return $result;
     }
 
-    public function getPublicationList(InstagramSimpleAccount $account, $nbpublications = 12)
+    public function getPublicationList(InstagramSimpleAccount $account,int $nbpublications = 12)
     {
         return $this->getPublicationsPage($account, $nbpublications);
     }
 
-    public function getPublicationsPage(InstagramSimpleAccount $account, int $nbpublications, string $endpointer = null)
+    public function getPublicationsPage(InstagramSimpleAccount $account, int $nbpublications=12, string $endpointer = null)
     {
         $publications = [];
+
+        if($nbpublications <1)
+        {
+            $nbpublications=12;
+        }
 
         $variables = '{"id":"'.$account->getId().'","first":"'.$nbpublications.'"';
 
@@ -224,7 +231,7 @@ class InstagramClient extends AbstractSocialClient
             'variables' => $variables,
             'query_hash' => '472f257a40c653c64c666ce877d59d2b',
         ];
-
+dump($variables);
         $response = $this->getApiUrl('https://www.instagram.com/graphql/query/', $options);
 
         if (false != $response) {
@@ -248,7 +255,7 @@ class InstagramClient extends AbstractSocialClient
     public function getPublication($shortCode): ?AbstractInstagramMedia
     {
         $options = [
-            // 'query_hash' => '472f257a40c653c64c666ce877d59d2b',
+            'query_hash' => '472f257a40c653c64c666ce877d59d2b',
             '__a' => '1',
             'type' => 'json',
         ];
@@ -256,15 +263,15 @@ class InstagramClient extends AbstractSocialClient
         $response = $this->getApiUrl('https://www.instagram.com/p/'.$shortCode.'/', $options);
 
         if (false != $response) {
-            switch ($response->shortcode_media->__typename) {
-                case AbstractInstagramMedia::INSTAGRAM_MEDIA_SIDECAR:
-                    return new InstagramVideo($response->shortcode_media);
+            switch ($response->graphql->shortcode_media->__typename) {
+                case AbstractInstagramMedia::INSTAGRAM_MEDIA_VIDEO:
+                    return new InstagramVideo($response->graphql->shortcode_media);
                 break;
                 case AbstractInstagramMedia::INSTAGRAM_MEDIA_SIDECAR:
-                    return new InstagramSideCar($response->shortcode_media);
+                    return new InstagramSideCar($response->graphql->shortcode_media);
                 break;
                 default:
-                    return new InstagramImage($response->shortcode_media);
+                    return new InstagramImage($response->graphql->shortcode_media);
                 break;
             }
         }
@@ -275,11 +282,6 @@ class InstagramClient extends AbstractSocialClient
     public static function TransformToLink(string $text = null)
     {
         if (null != $text) {
-            $test = 'tioietpozitepo';
-
-            if (true) {
-                $test = 'toto';
-            }
 
             // Gestion des #tag
             preg_match_all("/(\s#\w+)/u", $text, $matches);
