@@ -23,7 +23,7 @@ class TwitterClient extends AbstractSocialClient
         $response=$this->client->request('GET',$url);
 
         $results=array();
-        dump($response);
+        
         if($response->getStatusCode()== 200) {
 
             dump($response->getContent());

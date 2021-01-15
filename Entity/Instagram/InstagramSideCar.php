@@ -4,6 +4,7 @@ namespace ICS\SocialNetworkBundle\Entity\Instagram;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use ICS\MediaBundle\Entity\MediaImage;
 
 /**
  * @ORM\Entity()
@@ -48,5 +49,16 @@ class InstagramSideCar extends AbstractInstagramMedia
     public function getImagesUrls()
     {
         return $this->imagesUrls;
+    }
+
+    public function AddImage(MediaImage $image)
+    {
+        if(!$this->images->contains($image))
+        {
+            $this->images->add($image);
+        }
+
+
+        return $this;
     }
 }

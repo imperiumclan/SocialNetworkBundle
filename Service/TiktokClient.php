@@ -69,12 +69,9 @@ class TiktokClient extends AbstractSocialClient
 
         $response=$this->client->request('GET',$url);
         $results=array();
-        dump($response);
+        
         if($response->getStatusCode()== 200) {
-
-            $results=json_decode($response->getContent());
-            dump($results);
-            
+            $results=json_decode($response->getContent());        
         }
         
         return $results;

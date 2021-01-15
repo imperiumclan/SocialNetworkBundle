@@ -2,9 +2,9 @@
 
 {% block cardImage %}
     {% if media.image is not null %}
-        <img class="card-img-top" src="{{ asset(media.image.assetPath) }}"/>
-    {% else %}
-        <img class="card-img-top" src="{{ media.previewUrl }}"/>    
+        <img class="card-img-top" src="{{ asset(media.image.assetPath) }}"/> {# |imagine_filter('instagramSquare') #}
+    {# {% else %}
+        <img class="card-img-top" src="{{ media.previewUrl }}"/>     #}
     {% endif %}
     
     

@@ -58,13 +58,8 @@ abstract class AbstractSocialClient
             'max_redirects' => 5,
         ]);
         $contentType = $response->getHeaders()['content-type'][0];
-        dump($url.$options);
-        // dump($response->getContent());
+
         $this->cookie = '';
-        // dump($response->getHeaders());
-        // foreach ($response->getHeaders()['set-cookie'] as $cookieLine) {
-        //     $this->cookie = $this->cookie.$cookieLine;
-        // }
 
         if ($raw) {
             return $response->getContent();

@@ -49,7 +49,9 @@ class InstagramSimpleAccount
         }
         $this->username = $jsonResult->username;
         $this->fullname = $jsonResult->full_name;
-        $this->profilePicUrl = $jsonResult->profile_pic_url;
+        if (null != $jsonResult->profile_pic_url) {
+            $this->profilePicUrl = $jsonResult->profile_pic_url;
+        }
         $this->private = 'true' == $jsonResult->is_private;
         $this->verified = 'true' == $jsonResult->is_verified;
     }

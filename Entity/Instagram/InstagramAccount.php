@@ -182,4 +182,22 @@ class InstagramAccount extends InstagramSimpleAccount
 
         return $this;
     }
+
+    public function addPublication(AbstractInstagramMedia $publication)
+    {
+        if (!$this->publications->contains($publication)) {
+            $this->publications->add($publication);
+        }
+
+        return $this;
+    }
+
+    public function removePublication(AbstractInstagramMedia $publication)
+    {
+        if ($this->publications->contains($publication)) {
+            $this->publications->remove($publication);
+        }
+
+        return $this;
+    }
 }
