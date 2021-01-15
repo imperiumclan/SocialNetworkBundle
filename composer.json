@@ -2,7 +2,7 @@
     "name": "ics/socialnetwork-bundle",
     "description": "Social Network Management",
     "type": "symfony-bundle",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "license": "MIT",
     "autoload": {
         "psr-4": {
