@@ -6,6 +6,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpKernel\HttpCache\Store;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 abstract class AbstractSocialClient
 {
@@ -17,10 +19,10 @@ abstract class AbstractSocialClient
 
     protected $cookie;
 
-    protected function __construct(ContainerInterface $container, string $socialNetworkName)
+    protected function __construct(ContainerInterface $container, string $socialNetworkName, HttpClientInterface $client)
     {
-        $store = new Store($container->getParameter('kernel.project_dir').'/var/cache/WebServices/'.$socialNetworkName.'/');
-        $this->client = new CurlHttpClient();
+        $store = new Store($container->getParameter('kernel.project_dir') . '/var/cache/WebServices/' . $socialNetworkName . '/');
+        $this->client = $client;
 
         $this->headers = [
             'headers' => [
@@ -49,12 +51,12 @@ abstract class AbstractSocialClient
         if (count($requestOptions) > 0) {
             $options = '?';
             foreach ($requestOptions as $key => $opt) {
-                $options .= $key.'='.$opt.'&';
+                $options .= $key . '=' . $opt . '&';
             }
             $options = substr($options, 0, strlen($options) - 1);
         }
 
-        $response = $this->client->request('GET', $url.$options, [
+        $response = $this->client->request('GET', $url . $options, [
             'max_redirects' => 5,
         ]);
         $contentType = $response->getHeaders()['content-type'][0];
@@ -65,9 +67,25 @@ abstract class AbstractSocialClient
             return $response->getContent();
         } elseif (200 == $response->getStatusCode() && 'application/json; charset=utf-8' == $contentType) {
             return json_decode($response->getContent());
+        } elseif (200 == $response->getStatusCode() && 'text/html; charset=utf-8' == $contentType) {
+            $publicPath = $this->container->getParameter('kernel.project_dir') . '/public/apiError/';
+            if (!file_exists($publicPath)) {
+                mkdir($publicPath, 0775, true);
+            }
+
+            $fileCount = count(scandir($publicPath));
+            $fileCount++;
+            $content = $response->getContent();
+            $filePath = $publicPath . '/Error_' . $fileCount . '.html';
+            file_put_contents($filePath, $url . $options . (string)$content);
+
+            echo "Error HTML response. See @Url: /apiError/" . basename($filePath) . "\n";
+            return null;
         }
 
-        return;
+
+
+        return null;
     }
 
     abstract public function search(string $seacrh, $verifiedOnly = false);

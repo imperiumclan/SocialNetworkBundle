@@ -4,14 +4,79 @@
 {% block body %}
 
 <div class="container-fluid">
-<div class="row">
-
-    <div class="col-12 col-md-2">
-        <h3>{{ search.userInfo.user.nickname }}</h3>
-        <img class="img-thumbnail" src="{{ search.userInfo.user.avatarLarger }}"/>
+<div class="row my-3">
+    <div class="col-12 col-md-6 offset-md-3">
+        <form method="POST">
+            <div class="input-group">
+                <input class="form-control" type="text" name="search" value="{{ searchAccount }}">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+            </div>
+        </form>
     </div>
-
 </div>
+{% if search != null %}
+
+<div class="row">
+    <div class="col-12">
+        <h2>
+            <img height="64" class="img-fluid rounded-circle" src="{{ user.userInfo.user.avatarThumb }}" />
+            Account of {{ user.userInfo.user.nickname }}
+        </h2>
+        <p>{{ user.userInfo.user.signature }}</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        {% for items in search.itemList|batch(6) %}
+            <div class="card-deck my-3">
+             {% set complete = 0 %}
+            {% for item in items %}
+                <div class="card">
+                    <img class="card-img-top static" src="{{ item.video.cover }}"/>
+                    <img class="card-img-top dynamic d-none" src="{{ item.video.dynamicCover }}"/>
+                    <div class="card-body">
+                        <div class="text-muted">{{ item.createTime|date('d/m/Y H:i')}}</div>
+                        {{ item.desc }}
+
+                        {# {{ dump(item) }} #}
+                    </div>
+                </div>
+                 {% set complete = 6 - loop.index %}
+            {% endfor %}
+             {% if complete > 0 %}
+                {% for item in 1..complete %}
+                    <div class="card border-0"></div>
+                {% endfor %}
+            {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+
+    $(document).ready(function(){
+
+        $('.card').hover(function(){
+            $(this).children('.static').addClass('d-none');
+            $(this).children('.dynamic').removeClass('d-none');
+        });
+
+        $('.card').mouseleave(function(){
+            $(this).children('.static').removeClass('d-none');
+            $(this).children('.dynamic').addClass('d-none');
+        });
+    });
+
+</script>
+
 
 
 

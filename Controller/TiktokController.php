@@ -20,13 +20,23 @@ class TiktokController extends AbstractController
     /**
      * @Route("/tiktok" , name="ics_social_tiktok_homepage")
      */
-    public function index(Request $request,TiktokClient $client)
+    public function index(Request $request, TiktokClient $client)
     {
-        $search = $client->getItems("yelloz");
+        $searchAccount = $request->get('search', null);
+        $search = null;
+        $user = null;
+        if ($searchAccount != null) {
+            $search = $client->getItems($searchAccount);
+            $user = $client->getUser($searchAccount);
+        }
+        //$search = $client->getItems("yellz0");
+        // $search = $client->getItems("tayamillerr");
 
-        return $this->render('@SocialNetwork/tiktok/index.html.twig',array(
-            'search' => $search
+
+        return $this->render('@SocialNetwork/tiktok/index.html.twig', array(
+            'search' => $search,
+            'searchAccount' => $searchAccount,
+            'user' => $user
         ));
     }
-
 }

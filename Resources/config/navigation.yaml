@@ -20,6 +20,6 @@ navigation:
             social_tiktok:
               lib: TikTok
               icon: fab fa-tiktok
-              route: ics_social_homepage
+              route: ics_social_tiktok_homepage
           roles:
               - ROLE_ADMIN

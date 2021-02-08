@@ -200,4 +200,17 @@ class InstagramAccount extends InstagramSimpleAccount
 
         return $this;
     }
+
+    public function updateFromSimple(InstagramSimpleAccount $account)
+    {
+        $this->profilePicUrl = $account->getProfilePicUrl();
+        $this->verified = $account->getVerified();
+        $this->private = $account->getPrivate();
+        $this->fullname = $account->getFullName();
+        $this->biography = $account->getBiography();
+        $this->externalUrl = $account->getExternalUrl();
+        $this->followerCount = $account->getFollowerCount();
+        $this->facebookPage = $account->getFacebookPage();
+
+    }
 }
